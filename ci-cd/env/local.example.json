@@ -73,6 +73,13 @@
     "plateau_patience": 3,
     "improvement_epsilon": 0.01
   },
+  "portal": {
+    "admin_username": "admin",
+    "admin_password": "replace-with-a-strong-local-password",
+    "secret_key": "replace-with-a-random-secret-of-at-least-32-characters",
+    "approval_ttl_minutes": 10,
+    "port": 8080
+  },
   "agent": {
     "memory_messages": 12,
     "default_session_id": "local-demo",

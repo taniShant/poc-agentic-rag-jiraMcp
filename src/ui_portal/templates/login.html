@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Administrator login for Jira Operations">
+    <title>Sign in · Jira Operations</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <body class="login-page">
+    <main class="login-shell">
+      <section class="login-story">
+        <div class="login-brand"><span class="brand-mark">J</span> Jira Ops</div>
+        <p class="eyebrow light">Human-controlled automation</p>
+        <h1>Every Jira write deserves a clear decision.</h1>
+        <p>Review the evidence, inspect the exact payload, then approve only what should reach Jira.</p>
+        <div class="trust-line"><span></span>Read agents remain separate from write tools</div>
+      </section>
+      <section class="login-panel">
+        <div class="login-form-wrap">
+          <p class="eyebrow">Administrator access</p>
+          <h2>Welcome back</h2>
+          <p class="muted">Use the local administrator account configured for this portal.</p>
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+              <div class="flash {{ category }}" role="alert">{{ message }}</div>
+            {% endfor %}
+          {% endwith %}
+          <form method="post" class="login-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <label for="username">Username</label>
+            <input id="username" name="username" autocomplete="username" required autofocus>
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" autocomplete="current-password" required>
+            <button class="primary-button wide" type="submit">Sign in to ticket queue</button>
+          </form>
+          <p class="security-note">Local access only · session protected · approvals audited</p>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

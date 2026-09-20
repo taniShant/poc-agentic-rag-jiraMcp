@@ -122,6 +122,17 @@ class McpConfig:
 
 
 @dataclass(frozen=True)
+class PortalConfig:
+    """Local administrator portal authentication and runtime settings."""
+
+    admin_username: str
+    admin_password: str
+    secret_key: str
+    approval_ttl_minutes: int
+    port: int
+
+
+@dataclass(frozen=True)
 class LocalConfig:
     """Complete local application configuration."""
 
@@ -133,6 +144,7 @@ class LocalConfig:
     mcp: McpConfig
     agent: AgentConfig
     validation: ValidationConfig
+    portal: PortalConfig
     source_path: Path
 
 
@@ -264,6 +276,16 @@ def load_config(path: str | Path = "ci-cd/env/local.json") -> LocalConfig:
         plateau_patience=int(validation_values.get("plateau_patience", 3)),
         improvement_epsilon=float(validation_values.get("improvement_epsilon", 0.01)),
     )
+    portal_values = document.get("portal", {})
+    if not isinstance(portal_values, dict):
+        raise ValueError("local.json section 'portal' must be an object")
+    portal = PortalConfig(
+        admin_username=str(portal_values.get("admin_username", "admin")),
+        admin_password=str(portal_values.get("admin_password", "change-me")),
+        secret_key=str(portal_values.get("secret_key", "change-this-local-secret")),
+        approval_ttl_minutes=int(portal_values.get("approval_ttl_minutes", 10)),
+        port=int(portal_values.get("port", 8080)),
+    )
 
     if ollama.embedding_dimensions < 1:
         raise ValueError("ollama.embedding_dimensions must be positive")
@@ -336,6 +358,14 @@ def load_config(path: str | Path = "ci-cd/env/local.json") -> LocalConfig:
         raise ValueError("rovoMcp writer role requires write:jira:agent-interface scope")
     if rovo_mcp.oauth_timeout_seconds < 30:
         raise ValueError("rovoMcp.oauth_timeout_seconds must be at least 30")
+    if not portal.admin_username or not portal.admin_password:
+        raise ValueError("portal administrator credentials must not be empty")
+    if len(portal.secret_key) < 16:
+        raise ValueError("portal.secret_key must contain at least 16 characters")
+    if not 1 <= portal.approval_ttl_minutes <= 60:
+        raise ValueError("portal.approval_ttl_minutes must be between 1 and 60")
+    if not 1 <= portal.port <= 65535:
+        raise ValueError("portal.port must be a valid TCP port")
 
     return LocalConfig(
         ollama=ollama,
@@ -346,5 +376,6 @@ def load_config(path: str | Path = "ci-cd/env/local.json") -> LocalConfig:
         mcp=mcp,
         agent=agent,
         validation=validation,
+        portal=portal,
         source_path=source_path,
     )

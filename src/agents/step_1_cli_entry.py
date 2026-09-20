@@ -19,13 +19,12 @@ from src.agents.step_2_orchestrator import MultiAgentOrchestrator
 from src.agents.step_3_planner import PlannerAgent
 from src.agents.step_4_executor import ExecutorAgent
 from src.agents.step_5_critic import CriticAgent
-from src.agents.step_8_writer import WriterAgent
+from src.agents.step_8_writer import execute_approved_action
 from src.common.config import LocalConfig, load_config
 from src.memory.postgres import LocalStorage
 from src.mcp.rovo_mcp_client import create_rovo_mcp_client
 from src.vectorDb.embeddings import OllamaEmbeddings
 from src.vectorDb.retrieval import HybridKnowledgeRetriever
-from src.validations.step_7_human_approval import HumanApprovalValidator
 
 _RETRIEVER: HybridKnowledgeRetriever | None = None
 
@@ -238,43 +237,12 @@ def execute_approved_write(config: LocalConfig, approval_path: str | Path) -> st
         PermissionError: If approval validation fails.
         ValueError: If the approval was already used.
     """
-    if not config.rovo_mcp.enabled:
-        raise RuntimeError("approved Jira writes require rovoMcp.enabled=true")
-    if not config.validation.enabled:
-        raise RuntimeError("approved Jira writes require validation.enabled=true")
     document = json.loads(Path(approval_path).expanduser().read_text(encoding="utf-8"))
     if not isinstance(document, dict):
         raise ValueError("approval file must contain a JSON object")
     approval = ApprovedJiraAction.from_dict(document)
-    storage = LocalStorage(config.postgres)
-    stored = storage.get_jira_proposal(approval.request_id)
-    HumanApprovalValidator().validate(
-        approval,
-        stored.proposal,
-        stored.critic_verdict,
-    )
-    tool_name = WriterAgent.ACTION_TO_TOOL[approval.action]
-    storage.claim_jira_approval(approval, tool_name)
-    try:
-        writer_client = create_rovo_mcp_client(
-            config.rovo_mcp,
-            role="writer",
-            startup_timeout_seconds=config.mcp.startup_timeout_seconds,
-            request_timeout_seconds=config.agent.request_timeout_seconds,
-        )
-        with writer_client:
-            result = WriterAgent(
-                writer_client,
-                config.rovo_mcp.tools_for_role("writer"),
-            ).execute(approval)
-        storage.complete_jira_approval(result)
-        return json.dumps(result.to_dict(), indent=2, ensure_ascii=False)
-    except Exception as error:
-        storage.fail_jira_approval(
-            approval.approval_id,
-            f"{type(error).__name__}: {error}",
-        )
-        raise
+    result = execute_approved_action(config, approval)
+    return json.dumps(result.to_dict(), indent=2, ensure_ascii=False)
 
 
 def main() -> None:

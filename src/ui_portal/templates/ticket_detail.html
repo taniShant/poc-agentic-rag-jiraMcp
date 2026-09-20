@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}{{ ticket.issue_key }} · Jira Operations{% endblock %}
+{% block content %}
+  <a class="back-link" href="{{ url_for('tickets') }}">← Back to ticket queue</a>
+  <header class="detail-header">
+    <div>
+      <div class="detail-meta">
+        <span class="ticket-key">{{ ticket.issue_key }}</span>
+        <span class="status-pill {{ ticket.status_group }}"><i></i>{{ ticket.status }}</span>
+      </div>
+      <h1>{{ ticket.title }}</h1>
+      <p>{{ ticket.team_name }} · {{ ticket.assignee }} · {{ ticket.priority }} priority</p>
+    </div>
+    {% if ticket.jira_url %}
+      <a class="secondary-button" href="{{ ticket.jira_url }}" target="_blank" rel="noopener noreferrer">Open in Jira ↗</a>
+    {% endif %}
+  </header>
+
+  <div class="detail-grid">
+    <section class="content-card problem-card">
+      <p class="eyebrow">Problem statement</p>
+      <h2>What the ticket reports</h2>
+      <div class="prose">{{ ticket.problem or 'No problem description is indexed for this ticket.' }}</div>
+      {% if ticket.labels %}
+        <div class="label-list">
+          {% for label in ticket.labels %}<span>{{ label }}</span>{% endfor %}
+        </div>
+      {% endif %}
+    </section>
+
+    <section class="content-card resolution-card">
+      <p class="eyebrow">Resolution provided</p>
+      <h2>Proposed or recorded outcome</h2>
+      {% if ticket.approval and ticket.approval.agent_response %}
+        <div class="prose">{{ ticket.approval.agent_response }}</div>
+      {% elif ticket.resolution %}
+        <div class="prose">{{ ticket.resolution }}</div>
+      {% else %}
+        <p class="muted">No resolution has been provided yet.</p>
+      {% endif %}
+    </section>
+  </div>
+
+  <section class="approval-panel">
+    <div class="approval-copy">
+      <p class="eyebrow">Human approval gate</p>
+      {% if ticket.approval %}
+        <h2>{{ ticket.approval.action|replace('_', ' ')|title }}</h2>
+        <p>{{ ticket.approval.rationale }}</p>
+        <dl class="audit-list">
+          <div><dt>Critic verdict</dt><dd>{{ ticket.approval.critic_verdict }}</dd></div>
+          <div><dt>Payload hash</dt><dd class="hash">{{ ticket.approval.payload_hash }}</dd></div>
+          {% if ticket.approval.approved_by %}<div><dt>Approved by</dt><dd>{{ ticket.approval.approved_by }}</dd></div>{% endif %}
+        </dl>
+      {% else %}
+        <h2>No write proposed</h2>
+        <p>The agents have not proposed a Jira mutation for this ticket.</p>
+      {% endif %}
+    </div>
+    {% if ticket.approval %}
+      <div class="payload-card">
+        <div class="payload-title"><span>Exact Jira payload</span><small>Read-only</small></div>
+        <pre>{{ ticket.approval.payload|tojson(indent=2) }}</pre>
+      </div>
+    {% endif %}
+    <div class="approval-action">
+      {% if ticket.approval and ticket.approval.approval_needed and writes_enabled %}
+        <p>Approving executes this exact payload once through the restricted Rovo Writer.</p>
+        <form method="post" action="{{ url_for('approve_ticket', issue_key=ticket.issue_key) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="request_id" value="{{ ticket.approval.request_id }}">
+          <button class="primary-button" type="submit">Approve Jira action</button>
+        </form>
+      {% elif ticket.approval and ticket.approval.execution_status == 'completed' %}
+        <span class="large-state approved">✓ Approved and executed</span>
+      {% elif ticket.approval and not writes_enabled %}
+        <span class="large-state blocked">Enable Rovo MCP and validation to approve</span>
+      {% elif ticket.approval and ticket.approval.execution_status == 'processing' %}
+        <span class="large-state processing">Execution in progress</span>
+      {% elif ticket.approval and ticket.approval.critic_verdict != 'PASS' %}
+        <span class="large-state blocked">Waiting for Critic PASS</span>
+      {% else %}
+        <span class="large-state none">No approval required</span>
+      {% endif %}
+      {% if ticket.approval and ticket.approval.error_text %}
+        <p class="error-detail">Last attempt: {{ ticket.approval.error_text }}</p>
+      {% endif %}
+    </div>
+  </section>
+{% endblock %}

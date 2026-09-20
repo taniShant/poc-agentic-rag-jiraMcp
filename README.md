@@ -115,6 +115,13 @@ For the supplied Docker Compose services, the important values are:
     "min_individual_score": 3,
     "plateau_patience": 3,
     "improvement_epsilon": 0.01
+  },
+  "portal": {
+    "admin_username": "admin",
+    "admin_password": "replace-with-a-strong-local-password",
+    "secret_key": "replace-with-a-random-secret-of-at-least-32-characters",
+    "approval_ttl_minutes": 10,
+    "port": 8080
   }
 }
 ```
@@ -410,6 +417,63 @@ The unit tests do not require live PostgreSQL, OpenSearch, Ollama, or Jira:
 python -m unittest discover -s tests -v
 ```
 
+## 10. Run the administrator portal
+
+The Compose stack includes a Dockerized Flask portal at
+<http://localhost:8080>. It reads Jira ticket rows from the configured
+OpenSearch index and proposal/execution state from PostgreSQL.
+
+Before starting it:
+
+1. Set a strong `portal.admin_password` and random `portal.secret_key` in
+   `ci-cd/env/local.json`.
+2. Apply all PostgreSQL migrations, including `003_jira_action_approval.sql`.
+3. Populate OpenSearch with sample tickets or synchronize live Jira tickets.
+4. For live approvals, set `rovoMcp.enabled=true` and
+   `validation.enabled=true`.
+
+Start PostgreSQL, OpenSearch, and the portal together:
+
+```bash
+docker compose -f docker-compose.local.yml up -d --build
+docker compose -f docker-compose.local.yml ps
+```
+
+Open <http://localhost:8080> and sign in with the administrator credentials
+from `local.json`.
+
+The first portal screen shows ticket key, status, team, priority, update time,
+and approval state. Select a ticket to open the second screen, which shows the
+problem statement, agent or recorded resolution, exact immutable Jira payload,
+Critic verdict, payload hash, and approval button.
+
+The Approve button creates a short-lived approval using the signed-in username.
+The browser submits only the proposal request ID; the server reloads the exact
+issue, action, payload, and hash from PostgreSQL before using the restricted
+Rovo Writer. Completed or processing proposals cannot be approved again.
+
+### Rovo OAuth prerequisite for portal writes
+
+Complete the initial Rovo OAuth browser consent once from the host CLI before
+using the portal approval button. The portal container mounts the resulting
+`.local/rovo_oauth_tokens.json` and can reuse or refresh it:
+
+```bash
+python -m src.agents.step_1_cli_entry \
+  --config ci-cd/env/local.json \
+  --request-id oauth-check-001 \
+  "Read SCRUM-7 and summarize its current status"
+```
+
+If only the local sample dataset is required, leave Rovo disabled. Tickets are
+still visible, but write approval controls display as disabled.
+
+View portal logs:
+
+```bash
+docker compose -f docker-compose.local.yml logs -f portal
+```
+
 ## Routine start and stop
 
 Start the persisted PostgreSQL and OpenSearch services:
@@ -509,6 +573,10 @@ ollama rm nomic-embed-text
 - `src/validations/step_6_critic_reflections.py`: bounded Critic/Executor reflection controls
 - `src/validations/step_7_human_approval.py`: strict approval gate
 - `src/agents/step_8_writer.py`: deterministic, allowlisted Writer role
+- `src/ui_portal/app.py`: authenticated portal routes and approval action
+- `src/ui_portal/repository.py`: OpenSearch ticket and PostgreSQL approval views
+- `src/ui_portal/templates`: login, ticket queue, and ticket detail UI
+- `src/ui_portal/Dockerfile`: portal container image
 - `src/vectorDb/ingestion.py`: OpenSearch input pipeline
 - `src/vectorDb/retrieval.py`: hybrid retrieval
 - `src/mcp/jira_server.py`: read-only Jira MCP server

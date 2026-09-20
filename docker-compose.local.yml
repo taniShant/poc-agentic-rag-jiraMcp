@@ -46,6 +46,36 @@ services:
       retries: 18
       start_period: 30s
 
+  portal:
+    build:
+      context: .
+      dockerfile: src/ui_portal/Dockerfile
+    container_name: customer-agent-portal
+    environment:
+      PORTAL_CONFIG: /app/ci-cd/env/local.json
+      APP_POSTGRES_HOST: postgres
+      APP_OPENSEARCH_URL: http://opensearch:9200
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./ci-cd/env/local.json:/app/ci-cd/env/local.json:ro
+      - ./.local:/app/.local
+    depends_on:
+      postgres:
+        condition: service_healthy
+      opensearch:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://localhost:8080/health', timeout=3)"
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
 volumes:
   customer-agent-postgres-data:
   customer-agent-opensearch-data:

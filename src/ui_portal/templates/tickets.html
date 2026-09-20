@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Ticket queue · Jira Operations{% endblock %}
+{% block content %}
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Operations workspace</p>
+      <h1>Jira ticket queue</h1>
+      <p>Review indexed Jira tickets and act only where explicit approval is required.</p>
+    </div>
+    <div class="header-stat"><strong>{{ counts.all }}</strong><span>tickets in view</span></div>
+  </header>
+
+  <section class="toolbar" aria-label="Ticket filters">
+    <div class="status-tabs">
+      {% for value, label in [('all', 'All'), ('new', 'New'), ('open', 'Open'), ('closed', 'Closed')] %}
+        <a class="status-tab {% if selected_status == value %}selected{% endif %}"
+           href="{{ url_for('tickets', status=value, q=query) }}">
+          {{ label }} <span>{{ counts[value] }}</span>
+        </a>
+      {% endfor %}
+    </div>
+    <form class="search-form" method="get">
+      <input type="hidden" name="status" value="{{ selected_status }}">
+      <label class="sr-only" for="ticket-search">Search tickets</label>
+      <input id="ticket-search" name="q" value="{{ query }}" placeholder="Search key, problem or team">
+      <button type="submit">Search</button>
+    </form>
+  </section>
+
+  <section class="table-card">
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Ticket</th>
+            <th>Status</th>
+            <th>Team</th>
+            <th>Priority</th>
+            <th>Updated</th>
+            <th>Approval</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ticket in tickets %}
+            <tr>
+              <td class="ticket-cell">
+                <a href="{{ url_for('ticket_detail', issue_key=ticket.issue_key) }}">
+                  <span class="ticket-key">{{ ticket.issue_key }}</span>
+                  <strong>{{ ticket.title }}</strong>
+                </a>
+                <small>{{ ticket.category }}</small>
+              </td>
+              <td><span class="status-pill {{ ticket.status_group }}"><i></i>{{ ticket.status }}</span></td>
+              <td><strong class="team-name">{{ ticket.team_name }}</strong><small>{{ ticket.assignee }}</small></td>
+              <td><span class="priority">{{ ticket.priority }}</span></td>
+              <td class="date-cell">{{ ticket.updated }}</td>
+              <td class="approval-cell">
+                {% if ticket.approval and ticket.approval.approval_needed and writes_enabled %}
+                  <form method="post" action="{{ url_for('approve_ticket', issue_key=ticket.issue_key) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="request_id" value="{{ ticket.approval.request_id }}">
+                    <button class="approve-button" type="submit">Approve</button>
+                  </form>
+                {% elif ticket.approval and ticket.approval.approval_needed and not writes_enabled %}
+                  <span class="approval-state blocked">Writer disabled</span>
+                {% elif ticket.approval and ticket.approval.execution_status == 'completed' %}
+                  <span class="approval-state approved">Approved</span>
+                {% elif ticket.approval and ticket.approval.execution_status == 'processing' %}
+                  <span class="approval-state processing">Processing</span>
+                {% elif ticket.approval and ticket.approval.critic_verdict != 'PASS' %}
+                  <span class="approval-state blocked">Critic review</span>
+                {% else %}
+                  <span class="approval-state none">Not needed</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="6" class="empty-state">No tickets match this view.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+{% endblock %}

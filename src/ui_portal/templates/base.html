@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Local Jira resolution and approval portal">
+    <title>{% block title %}Jira Operations{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="{{ url_for('tickets') }}" aria-label="Jira Operations home">
+          <span class="brand-mark">J</span>
+          <span><strong>Jira Ops</strong><small>Resolution control</small></span>
+        </a>
+        <nav class="side-nav" aria-label="Primary navigation">
+          <a class="nav-link active" href="{{ url_for('tickets') }}">
+            <span class="nav-dot"></span>Ticket queue
+          </a>
+        </nav>
+        <div class="sidebar-foot">
+          <div class="user-card">
+            <span class="avatar">{{ admin_username[:1]|upper }}</span>
+            <span><strong>{{ admin_username }}</strong><small>Administrator</small></span>
+          </div>
+          <form method="post" action="{{ url_for('logout') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="text-button" type="submit">Sign out</button>
+          </form>
+        </div>
+      </aside>
+      <main class="main-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% for category, message in messages %}
+            <div class="flash {{ category }}" role="status">{{ message }}</div>
+          {% endfor %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </body>
+</html>
