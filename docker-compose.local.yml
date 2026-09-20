@@ -1,0 +1,51 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: customer-agent-postgres
+    environment:
+      POSTGRES_DB: agentic_local
+      POSTGRES_USER: agentic_local
+      POSTGRES_PASSWORD: change-me
+    ports:
+      - "5432:5432"
+    volumes:
+      - customer-agent-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agentic_local -d agentic_local"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  opensearch:
+    image: opensearchproject/opensearch:3.8.0
+    container_name: customer-agent-opensearch
+    environment:
+      discovery.type: single-node
+      cluster.name: customer-agent-local
+      node.name: customer-agent-opensearch
+      bootstrap.memory_lock: "true"
+      OPENSEARCH_JAVA_OPTS: -Xms512m -Xmx512m
+      DISABLE_INSTALL_DEMO_CONFIG: "true"
+      DISABLE_SECURITY_PLUGIN: "true"
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+    volumes:
+      - customer-agent-opensearch-data:/usr/share/opensearch/data
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:9200/_cluster/health >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 30s
+
+volumes:
+  customer-agent-postgres-data:
+  customer-agent-opensearch-data:

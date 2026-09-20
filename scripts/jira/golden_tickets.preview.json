@@ -1,0 +1,3802 @@
+[
+  {
+    "external_id": "golden-ticket-001",
+    "category": "Identity / Password reset",
+    "summary": "[Golden 001] Password reset and account unlock completed - case 1",
+    "requester": "Synthetic User 001",
+    "requester_email": "synthetic.user001@example.invalid",
+    "department": "Finance",
+    "location": "London",
+    "environment": "Corporate",
+    "opened_date": "2025-01-06",
+    "completed_date": "2025-01-07",
+    "request": "The user could not sign in after repeated password attempts and the directory account became locked.",
+    "business_justification": "Restore access to approved corporate services without changing the user's existing authorization.",
+    "checks": [
+      "Verified the requester through the approved identity challenge.",
+      "Confirmed the account was active and not under an HR or security hold.",
+      "Checked sign-in logs for indicators of credential abuse."
+    ],
+    "resolution_steps": [
+      "Unlocked the directory account.",
+      "Issued a temporary password through the approved secure channel.",
+      "Required password change at the next sign-in and revoked active sessions."
+    ],
+    "validation": [
+      "User signed in with the temporary credential.",
+      "User changed the password and completed MFA.",
+      "No further failed sign-ins appeared during the observation window."
+    ],
+    "resolution_code": "Solved - identity verified and access restored",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-001",
+      "password-reset",
+      "account-unlock",
+      "identity",
+      "case-variant-1"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-002",
+    "category": "Identity / New account",
+    "summary": "[Golden 002] New employee account provisioned - case 1",
+    "requester": "Synthetic User 002",
+    "requester_email": "synthetic.user002@example.invalid",
+    "department": "Engineering",
+    "location": "Manchester",
+    "environment": "Staging",
+    "opened_date": "2025-01-09",
+    "completed_date": "2025-01-11",
+    "request": "A manager requested a standard corporate account for an approved new starter.",
+    "business_justification": "Provide day-one access aligned to the employee's role and start date.",
+    "checks": [
+      "Matched the request to an approved onboarding record.",
+      "Confirmed manager, department, start date, and license availability.",
+      "Verified that no active or dormant duplicate identity existed."
+    ],
+    "resolution_steps": [
+      "Created the directory identity using the naming standard.",
+      "Assigned the baseline license and role-based groups.",
+      "Sent activation instructions to the manager through the approved channel."
+    ],
+    "validation": [
+      "Account appeared in the directory and target applications.",
+      "Manager confirmed the expected baseline access.",
+      "User completed first sign-in and MFA registration."
+    ],
+    "resolution_code": "Fulfilled - account provisioned",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-002",
+      "new-account",
+      "onboarding",
+      "identity",
+      "case-variant-1"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-003",
+    "category": "Access / Application permission",
+    "summary": "[Golden 003] Application role permission granted - case 1",
+    "requester": "Synthetic User 003",
+    "requester_email": "synthetic.user003@example.invalid",
+    "department": "Customer Support",
+    "location": "Remote UK",
+    "environment": "Development",
+    "opened_date": "2025-01-12",
+    "completed_date": "2025-01-15",
+    "request": "The user required an additional application role to perform an assigned business function.",
+    "business_justification": "Enable an approved duty while maintaining least privilege and segregation of duties.",
+    "checks": [
+      "Confirmed manager and application-owner approval.",
+      "Checked role conflicts and segregation-of-duties rules.",
+      "Verified the requested access scope and expiry date."
+    ],
+    "resolution_steps": [
+      "Assigned the least-privilege application role.",
+      "Recorded the approval reference in the access register.",
+      "Forced a fresh application session so the entitlement was re-evaluated."
+    ],
+    "validation": [
+      "User demonstrated the required function.",
+      "A prohibited administrative function remained unavailable.",
+      "Entitlement appeared in the access review report."
+    ],
+    "resolution_code": "Fulfilled - approved least-privilege role assigned",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-003",
+      "application-access",
+      "least-privilege",
+      "approval",
+      "case-variant-1"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-004",
+    "category": "Endpoint / Software installation",
+    "summary": "[Golden 004] Approved software installed on managed endpoint - case 1",
+    "requester": "Synthetic User 004",
+    "requester_email": "synthetic.user004@example.invalid",
+    "department": "Sales",
+    "location": "Dublin",
+    "environment": "Production",
+    "opened_date": "2025-01-15",
+    "completed_date": "2025-01-16",
+    "request": "The user requested an approved software package that was not present on the managed workstation.",
+    "business_justification": "Provide the supported tool required for the user's assigned work.",
+    "checks": [
+      "Confirmed the device was corporate-managed and compliant.",
+      "Verified software approval, license availability, and platform compatibility.",
+      "Checked that no conflicting or unsupported version was installed."
+    ],
+    "resolution_steps": [
+      "Deployed the signed package through endpoint management.",
+      "Applied the standard configuration and security policy.",
+      "Recorded the installed version and license allocation."
+    ],
+    "validation": [
+      "Application launched successfully under the user's account.",
+      "Endpoint protection reported no finding.",
+      "User completed the documented functional smoke test."
+    ],
+    "resolution_code": "Fulfilled - supported software installed",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-004",
+      "software-install",
+      "endpoint",
+      "license",
+      "case-variant-1"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-005",
+    "category": "Access / Active Directory group",
+    "summary": "[Golden 005] Active Directory group membership granted - case 1",
+    "requester": "Synthetic User 005",
+    "requester_email": "synthetic.user005@example.invalid",
+    "department": "Operations",
+    "location": "Edinburgh",
+    "environment": "Test",
+    "opened_date": "2025-01-18",
+    "completed_date": "2025-01-20",
+    "request": "The user needed membership in a controlled directory group for an approved resource.",
+    "business_justification": "Grant narrowly scoped access required by the user's current role.",
+    "checks": [
+      "Validated group owner and line-manager approval.",
+      "Reviewed nested-group impact and privileged-access classification.",
+      "Confirmed no conflicting entitlement was present."
+    ],
+    "resolution_steps": [
+      "Added the user to the approved group.",
+      "Recorded the access owner and review date.",
+      "Triggered directory synchronization and refreshed the user session."
+    ],
+    "validation": [
+      "Effective membership was visible on the target resource.",
+      "User accessed the approved resource only.",
+      "Access-review evidence contained the new membership."
+    ],
+    "resolution_code": "Fulfilled - directory group membership assigned",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-005",
+      "active-directory",
+      "group-membership",
+      "access",
+      "case-variant-1"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-006",
+    "category": "Change / Production project move",
+    "summary": "[Golden 006] Approved project release promoted to production - case 1",
+    "requester": "Synthetic User 006",
+    "requester_email": "synthetic.user006@example.invalid",
+    "department": "Finance",
+    "location": "London",
+    "environment": "Corporate",
+    "opened_date": "2025-01-21",
+    "completed_date": "2025-01-24",
+    "request": "A tested project release required controlled promotion from staging to production.",
+    "business_justification": "Deliver an approved production change while preserving rollback and auditability.",
+    "checks": [
+      "Verified change approval, maintenance window, test evidence, and business owner sign-off.",
+      "Confirmed backups, deployment artifact checksum, dependencies, and rollback plan.",
+      "Checked monitoring health and absence of conflicting production changes."
+    ],
+    "resolution_steps": [
+      "Placed the service in the approved change window.",
+      "Promoted the immutable release artifact using the deployment runbook.",
+      "Applied configuration, ran migrations, and retained the previous release for rollback."
+    ],
+    "validation": [
+      "Smoke tests and health checks passed.",
+      "Business owner validated the critical user journey.",
+      "Monitoring remained normal and the change record was closed."
+    ],
+    "resolution_code": "Successful - production deployment validated",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-006",
+      "production-change",
+      "deployment",
+      "change-management",
+      "case-variant-1"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-007",
+    "category": "Network / VPN access",
+    "summary": "[Golden 007] Remote-access VPN enabled - case 1",
+    "requester": "Synthetic User 007",
+    "requester_email": "synthetic.user007@example.invalid",
+    "department": "Engineering",
+    "location": "Manchester",
+    "environment": "Staging",
+    "opened_date": "2025-01-24",
+    "completed_date": "2025-01-25",
+    "request": "The user required remote access to approved internal services from a managed device.",
+    "business_justification": "Support authorized remote work without exposing unrestricted network access.",
+    "checks": [
+      "Confirmed employment status, manager approval, and device compliance.",
+      "Verified MFA enrollment and the required network access profile.",
+      "Checked for an existing suspended or duplicate VPN entitlement."
+    ],
+    "resolution_steps": [
+      "Assigned the restricted VPN profile.",
+      "Installed the managed client configuration.",
+      "Registered the entitlement for periodic access review."
+    ],
+    "validation": [
+      "User connected with MFA from the managed endpoint.",
+      "Only approved network routes were reachable.",
+      "Authentication and tunnel logs showed a successful compliant session."
+    ],
+    "resolution_code": "Fulfilled - restricted VPN access enabled",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-007",
+      "vpn",
+      "remote-access",
+      "network",
+      "case-variant-1"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-008",
+    "category": "Identity / MFA replacement",
+    "summary": "[Golden 008] MFA method replaced after device change - case 1",
+    "requester": "Synthetic User 008",
+    "requester_email": "synthetic.user008@example.invalid",
+    "department": "Customer Support",
+    "location": "Remote UK",
+    "environment": "Development",
+    "opened_date": "2025-01-27",
+    "completed_date": "2025-01-29",
+    "request": "The user replaced or lost the registered authentication device and could not complete MFA.",
+    "business_justification": "Restore secure authentication after verifying the account holder.",
+    "checks": [
+      "Completed enhanced identity verification.",
+      "Reviewed recent sign-ins and confirmed the old device was no longer trusted.",
+      "Checked that the request was not associated with an active security incident."
+    ],
+    "resolution_steps": [
+      "Revoked the old MFA registration and active sessions.",
+      "Issued a time-limited registration method.",
+      "Registered the replacement authenticator and required a new sign-in."
+    ],
+    "validation": [
+      "User completed MFA with the replacement device.",
+      "The old method no longer authenticated.",
+      "The identity audit log recorded revocation and registration."
+    ],
+    "resolution_code": "Solved - MFA securely re-registered",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-008",
+      "mfa",
+      "device-replacement",
+      "identity",
+      "case-variant-1"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-009",
+    "category": "Data / Database read access",
+    "summary": "[Golden 009] Read-only database access granted - case 1",
+    "requester": "Synthetic User 009",
+    "requester_email": "synthetic.user009@example.invalid",
+    "department": "Sales",
+    "location": "Dublin",
+    "environment": "Production",
+    "opened_date": "2025-01-30",
+    "completed_date": "2025-02-02",
+    "request": "An analyst required read-only access to an approved reporting database and schema.",
+    "business_justification": "Enable reporting while preventing data modification and unnecessary data exposure.",
+    "checks": [
+      "Confirmed data-owner and manager approval.",
+      "Reviewed data classification and mandatory training.",
+      "Validated that the requested schema and duration matched the business need."
+    ],
+    "resolution_steps": [
+      "Created or mapped the user to the read-only database role.",
+      "Restricted connectivity to the approved network path.",
+      "Recorded the grant, owner, scope, and expiry in the access register."
+    ],
+    "validation": [
+      "A permitted SELECT query succeeded.",
+      "INSERT, UPDATE, DELETE, and administrative operations were denied.",
+      "Audit logging captured the test session."
+    ],
+    "resolution_code": "Fulfilled - scoped read-only data access granted",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-009",
+      "database",
+      "read-only",
+      "data-access",
+      "case-variant-1"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-010",
+    "category": "Messaging / Shared mailbox",
+    "summary": "[Golden 010] Shared mailbox access configured - case 1",
+    "requester": "Synthetic User 010",
+    "requester_email": "synthetic.user010@example.invalid",
+    "department": "Operations",
+    "location": "Edinburgh",
+    "environment": "Test",
+    "opened_date": "2025-02-02",
+    "completed_date": "2025-02-03",
+    "request": "The user required access to a team mailbox for an approved operational responsibility.",
+    "business_justification": "Allow the team to manage shared correspondence with accountable permissions.",
+    "checks": [
+      "Confirmed mailbox owner and manager approval.",
+      "Validated whether read/manage or send-as permission was required.",
+      "Checked for conflicting delegation and retention restrictions."
+    ],
+    "resolution_steps": [
+      "Granted only the approved mailbox permissions.",
+      "Applied the standard automapping setting.",
+      "Recorded the delegate and review date."
+    ],
+    "validation": [
+      "Mailbox appeared in the user's client after token refresh.",
+      "The user could perform approved actions only.",
+      "Mailbox audit logging recorded the validation action."
+    ],
+    "resolution_code": "Fulfilled - shared mailbox delegation applied",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-010",
+      "shared-mailbox",
+      "messaging",
+      "delegation",
+      "case-variant-1"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-011",
+    "category": "Messaging / Distribution list",
+    "summary": "[Golden 011] Distribution list membership updated - case 1",
+    "requester": "Synthetic User 011",
+    "requester_email": "synthetic.user011@example.invalid",
+    "department": "Finance",
+    "location": "London",
+    "environment": "Corporate",
+    "opened_date": "2025-02-05",
+    "completed_date": "2025-02-07",
+    "request": "The user needed membership in a controlled business distribution list.",
+    "business_justification": "Ensure the user receives role-relevant operational communications.",
+    "checks": [
+      "Confirmed list owner approval and membership criteria.",
+      "Verified that the address was active and not already nested in the list.",
+      "Checked restrictions for confidential or regulated communications."
+    ],
+    "resolution_steps": [
+      "Added the user as a direct member of the approved list.",
+      "Triggered directory synchronization.",
+      "Documented ownership and the next review date."
+    ],
+    "validation": [
+      "Membership was visible in the directory.",
+      "A controlled test message was delivered.",
+      "No unintended distribution lists were added."
+    ],
+    "resolution_code": "Fulfilled - distribution membership updated",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-011",
+      "distribution-list",
+      "messaging",
+      "membership",
+      "case-variant-1"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-012",
+    "category": "Endpoint / Hardware replacement",
+    "summary": "[Golden 012] Faulty managed laptop replaced - case 1",
+    "requester": "Synthetic User 012",
+    "requester_email": "synthetic.user012@example.invalid",
+    "department": "Engineering",
+    "location": "Manchester",
+    "environment": "Staging",
+    "opened_date": "2025-02-08",
+    "completed_date": "2025-02-11",
+    "request": "The managed laptop had a confirmed hardware fault that prevented reliable work.",
+    "business_justification": "Restore productivity while preserving corporate data and asset accountability.",
+    "checks": [
+      "Confirmed the hardware diagnosis and warranty status.",
+      "Verified backup or approved data-recovery status.",
+      "Matched an available replacement to the user's role profile."
+    ],
+    "resolution_steps": [
+      "Prepared the replacement with the standard managed image.",
+      "Restored approved user data and required applications.",
+      "Transferred asset ownership and quarantined the faulty device for repair or secure disposal."
+    ],
+    "validation": [
+      "Device compliance, encryption, endpoint protection, and patching were healthy.",
+      "User completed sign-in and application smoke tests.",
+      "Asset inventory reflected both the replacement and returned device."
+    ],
+    "resolution_code": "Solved - compliant replacement device issued",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-012",
+      "hardware",
+      "laptop",
+      "asset-management",
+      "case-variant-1"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-013",
+    "category": "License / SaaS allocation",
+    "summary": "[Golden 013] SaaS product license allocated - case 1",
+    "requester": "Synthetic User 013",
+    "requester_email": "synthetic.user013@example.invalid",
+    "department": "Customer Support",
+    "location": "Remote UK",
+    "environment": "Development",
+    "opened_date": "2025-02-11",
+    "completed_date": "2025-02-12",
+    "request": "The user required a licensed SaaS product for an approved role responsibility.",
+    "business_justification": "Provide required functionality while controlling recurring license cost.",
+    "checks": [
+      "Confirmed manager approval and product eligibility.",
+      "Checked available license inventory and duplicate subscriptions.",
+      "Verified that a lower-cost role would not satisfy the requirement."
+    ],
+    "resolution_steps": [
+      "Allocated the minimum suitable license tier.",
+      "Assigned the standard security and sharing policy.",
+      "Recorded the cost center and license-review date."
+    ],
+    "validation": [
+      "User accessed the licensed features.",
+      "The license console showed one active assignment.",
+      "No duplicate license remained allocated."
+    ],
+    "resolution_code": "Fulfilled - approved license allocated",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-013",
+      "license",
+      "saas",
+      "cost-control",
+      "case-variant-1"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-014",
+    "category": "Identity / Service account",
+    "summary": "[Golden 014] Service account provisioned with controlled credentials - case 1",
+    "requester": "Synthetic User 014",
+    "requester_email": "synthetic.user014@example.invalid",
+    "department": "Sales",
+    "location": "Dublin",
+    "environment": "Production",
+    "opened_date": "2025-02-14",
+    "completed_date": "2025-02-16",
+    "request": "An approved workload required a non-interactive identity for a defined integration.",
+    "business_justification": "Enable automation with traceable ownership and minimum privileges.",
+    "checks": [
+      "Confirmed application-owner and security approval.",
+      "Documented purpose, owner, environments, required permissions, and expiry.",
+      "Verified that a managed identity was unavailable or unsuitable."
+    ],
+    "resolution_steps": [
+      "Created the non-interactive account using the service naming standard.",
+      "Assigned only the approved roles and denied interactive sign-in where supported.",
+      "Stored the generated credential in the approved secrets manager with rotation metadata."
+    ],
+    "validation": [
+      "The workload authenticated and completed its permitted operation.",
+      "Interactive and unrelated resource access were denied.",
+      "Monitoring, rotation, and ownership records were present."
+    ],
+    "resolution_code": "Fulfilled - controlled service identity provisioned",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-014",
+      "service-account",
+      "automation",
+      "secrets",
+      "case-variant-1"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-015",
+    "category": "Engineering / Source repository access",
+    "summary": "[Golden 015] Repository permission granted - case 1",
+    "requester": "Synthetic User 015",
+    "requester_email": "synthetic.user015@example.invalid",
+    "department": "Operations",
+    "location": "Edinburgh",
+    "environment": "Test",
+    "opened_date": "2025-02-17",
+    "completed_date": "2025-02-20",
+    "request": "An engineer required access to a source repository for an assigned project.",
+    "business_justification": "Enable contribution while protecting branches and sensitive repositories.",
+    "checks": [
+      "Confirmed repository owner and manager approval.",
+      "Verified employment status, security training, and team membership.",
+      "Selected the minimum read or write role required."
+    ],
+    "resolution_steps": [
+      "Added the user through the approved repository team.",
+      "Applied branch protection and required-review policies.",
+      "Recorded the access grant for periodic review."
+    ],
+    "validation": [
+      "User cloned the repository and created a test branch where authorized.",
+      "Protected-branch direct push remained blocked.",
+      "Repository audit logs recorded the access change."
+    ],
+    "resolution_code": "Fulfilled - repository access granted",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-015",
+      "source-control",
+      "repository",
+      "engineering-access",
+      "case-variant-1"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-016",
+    "category": "Integration / SFTP partner access",
+    "summary": "[Golden 016] Restricted SFTP exchange access configured - case 1",
+    "requester": "Synthetic User 016",
+    "requester_email": "synthetic.user016@example.invalid",
+    "department": "Finance",
+    "location": "London",
+    "environment": "Corporate",
+    "opened_date": "2025-02-20",
+    "completed_date": "2025-02-21",
+    "request": "An approved partner exchange required access to a dedicated SFTP location.",
+    "business_justification": "Transfer agreed files through a controlled, auditable channel.",
+    "checks": [
+      "Confirmed data-owner, security, and partner approval.",
+      "Validated data classification, source IPs, retention, and exchange path.",
+      "Verified a unique account and SSH public key were supplied."
+    ],
+    "resolution_steps": [
+      "Created a chrooted account restricted to the approved directory.",
+      "Installed the partner public key and source-IP restriction.",
+      "Enabled transfer logging, retention, and expiration controls."
+    ],
+    "validation": [
+      "A test upload and download succeeded in the approved path.",
+      "Parent and peer directories were inaccessible.",
+      "Transfer and authentication events appeared in monitoring."
+    ],
+    "resolution_code": "Fulfilled - restricted file exchange enabled",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-016",
+      "sftp",
+      "partner",
+      "file-transfer",
+      "case-variant-1"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-017",
+    "category": "Network / Firewall rule",
+    "summary": "[Golden 017] Approved firewall connectivity enabled - case 1",
+    "requester": "Synthetic User 017",
+    "requester_email": "synthetic.user017@example.invalid",
+    "department": "Engineering",
+    "location": "Manchester",
+    "environment": "Staging",
+    "opened_date": "2025-02-23",
+    "completed_date": "2025-02-25",
+    "request": "An application required a specific source-to-destination network flow that was blocked.",
+    "business_justification": "Enable an approved service dependency without creating broad network exposure.",
+    "checks": [
+      "Confirmed application owner and security approval.",
+      "Validated source, destination, protocol, port, environment, and expiry.",
+      "Reviewed overlap, threat exposure, and an available rollback plan."
+    ],
+    "resolution_steps": [
+      "Created the narrow firewall rule in the approved change window.",
+      "Attached logging and the documented expiration date.",
+      "Committed the policy and monitored deployment health."
+    ],
+    "validation": [
+      "The intended TCP connection succeeded.",
+      "Unapproved ports and sources remained blocked.",
+      "Firewall logs showed only the expected test traffic."
+    ],
+    "resolution_code": "Successful - least-privilege network flow enabled",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-017",
+      "firewall",
+      "network",
+      "change-management",
+      "case-variant-1"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-018",
+    "category": "Identity / Offboarding",
+    "summary": "[Golden 018] Departed user access removed - case 1",
+    "requester": "Synthetic User 018",
+    "requester_email": "synthetic.user018@example.invalid",
+    "department": "Customer Support",
+    "location": "Remote UK",
+    "environment": "Development",
+    "opened_date": "2025-02-26",
+    "completed_date": "2025-03-01",
+    "request": "HR submitted an approved termination or departure event for a user account.",
+    "business_justification": "Remove access on time while preserving required business records and legal holds.",
+    "checks": [
+      "Validated the HR event, effective time, manager, and legal-hold requirements.",
+      "Collected the user's accounts, privileged roles, devices, sessions, and owned resources.",
+      "Confirmed mailbox and file-transfer instructions with the manager."
+    ],
+    "resolution_steps": [
+      "Disabled sign-in and revoked active sessions and MFA methods.",
+      "Removed groups, licenses, tokens, VPN, and application access.",
+      "Transferred approved data ownership and updated the asset-return record."
+    ],
+    "validation": [
+      "Authentication attempts were denied after the effective time.",
+      "Access reports showed no active entitlements.",
+      "Manager and HR confirmed data transfer and asset status."
+    ],
+    "resolution_code": "Completed - access revoked and records retained",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-018",
+      "offboarding",
+      "access-revocation",
+      "identity",
+      "case-variant-1"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-019",
+    "category": "Cloud / Console access",
+    "summary": "[Golden 019] Cloud console role assigned - case 1",
+    "requester": "Synthetic User 019",
+    "requester_email": "synthetic.user019@example.invalid",
+    "department": "Sales",
+    "location": "Dublin",
+    "environment": "Production",
+    "opened_date": "2025-03-01",
+    "completed_date": "2025-03-02",
+    "request": "An engineer required console access to an approved cloud account and environment.",
+    "business_justification": "Support operational duties with time-bound, least-privilege cloud authorization.",
+    "checks": [
+      "Confirmed manager, account owner, and security approval.",
+      "Mapped requested duties to the approved role catalog.",
+      "Checked privileged-role conflicts, MFA, and training status."
+    ],
+    "resolution_steps": [
+      "Assigned the approved federated role to the engineer's access group.",
+      "Applied session duration and environment restrictions.",
+      "Recorded owner, purpose, and access-review date."
+    ],
+    "validation": [
+      "Federated sign-in with MFA succeeded.",
+      "A permitted read or deployment check succeeded.",
+      "Administrative actions outside the role remained denied and logged."
+    ],
+    "resolution_code": "Fulfilled - federated cloud role assigned",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-019",
+      "cloud",
+      "console-access",
+      "least-privilege",
+      "case-variant-1"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-020",
+    "category": "Support / Email delivery",
+    "summary": "[Golden 020] Email delivery issue diagnosed and resolved - case 1",
+    "requester": "Synthetic User 020",
+    "requester_email": "synthetic.user020@example.invalid",
+    "department": "Operations",
+    "location": "Edinburgh",
+    "environment": "Test",
+    "opened_date": "2025-03-04",
+    "completed_date": "2025-03-06",
+    "request": "Messages from an approved sender were delayed or quarantined before reaching the user.",
+    "business_justification": "Restore legitimate mail flow without weakening organization-wide protection.",
+    "checks": [
+      "Collected message ID, sender, recipient, timestamp, and expected subject.",
+      "Traced the message and reviewed authentication and filtering verdicts.",
+      "Confirmed the sender and content were legitimate with the business owner."
+    ],
+    "resolution_steps": [
+      "Corrected the narrowly scoped sender or policy configuration.",
+      "Released the validated message where policy allowed.",
+      "Retained anti-phishing, malware, and bulk-mail protections."
+    ],
+    "validation": [
+      "A new authenticated test message was delivered.",
+      "Message trace showed the expected policy result.",
+      "Unrelated spoofed test mail remained blocked."
+    ],
+    "resolution_code": "Solved - legitimate mail flow restored",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-020",
+      "email",
+      "delivery",
+      "messaging",
+      "case-variant-1"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-021",
+    "category": "Identity / Password reset",
+    "summary": "[Golden 021] Password reset and account unlock completed - case 2",
+    "requester": "Synthetic User 021",
+    "requester_email": "synthetic.user021@example.invalid",
+    "department": "Finance",
+    "location": "London",
+    "environment": "Corporate",
+    "opened_date": "2025-03-07",
+    "completed_date": "2025-03-10",
+    "request": "The user could not sign in after repeated password attempts and the directory account became locked.",
+    "business_justification": "Restore access to approved corporate services without changing the user's existing authorization.",
+    "checks": [
+      "Verified the requester through the approved identity challenge.",
+      "Confirmed the account was active and not under an HR or security hold.",
+      "Checked sign-in logs for indicators of credential abuse."
+    ],
+    "resolution_steps": [
+      "Unlocked the directory account.",
+      "Issued a temporary password through the approved secure channel.",
+      "Required password change at the next sign-in and revoked active sessions."
+    ],
+    "validation": [
+      "User signed in with the temporary credential.",
+      "User changed the password and completed MFA.",
+      "No further failed sign-ins appeared during the observation window."
+    ],
+    "resolution_code": "Solved - identity verified and access restored",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-021",
+      "password-reset",
+      "account-unlock",
+      "identity",
+      "case-variant-2"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-022",
+    "category": "Identity / New account",
+    "summary": "[Golden 022] New employee account provisioned - case 2",
+    "requester": "Synthetic User 022",
+    "requester_email": "synthetic.user022@example.invalid",
+    "department": "Engineering",
+    "location": "Manchester",
+    "environment": "Staging",
+    "opened_date": "2025-03-10",
+    "completed_date": "2025-03-11",
+    "request": "A manager requested a standard corporate account for an approved new starter.",
+    "business_justification": "Provide day-one access aligned to the employee's role and start date.",
+    "checks": [
+      "Matched the request to an approved onboarding record.",
+      "Confirmed manager, department, start date, and license availability.",
+      "Verified that no active or dormant duplicate identity existed."
+    ],
+    "resolution_steps": [
+      "Created the directory identity using the naming standard.",
+      "Assigned the baseline license and role-based groups.",
+      "Sent activation instructions to the manager through the approved channel."
+    ],
+    "validation": [
+      "Account appeared in the directory and target applications.",
+      "Manager confirmed the expected baseline access.",
+      "User completed first sign-in and MFA registration."
+    ],
+    "resolution_code": "Fulfilled - account provisioned",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-022",
+      "new-account",
+      "onboarding",
+      "identity",
+      "case-variant-2"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-023",
+    "category": "Access / Application permission",
+    "summary": "[Golden 023] Application role permission granted - case 2",
+    "requester": "Synthetic User 023",
+    "requester_email": "synthetic.user023@example.invalid",
+    "department": "Customer Support",
+    "location": "Remote UK",
+    "environment": "Development",
+    "opened_date": "2025-03-13",
+    "completed_date": "2025-03-15",
+    "request": "The user required an additional application role to perform an assigned business function.",
+    "business_justification": "Enable an approved duty while maintaining least privilege and segregation of duties.",
+    "checks": [
+      "Confirmed manager and application-owner approval.",
+      "Checked role conflicts and segregation-of-duties rules.",
+      "Verified the requested access scope and expiry date."
+    ],
+    "resolution_steps": [
+      "Assigned the least-privilege application role.",
+      "Recorded the approval reference in the access register.",
+      "Forced a fresh application session so the entitlement was re-evaluated."
+    ],
+    "validation": [
+      "User demonstrated the required function.",
+      "A prohibited administrative function remained unavailable.",
+      "Entitlement appeared in the access review report."
+    ],
+    "resolution_code": "Fulfilled - approved least-privilege role assigned",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-023",
+      "application-access",
+      "least-privilege",
+      "approval",
+      "case-variant-2"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-024",
+    "category": "Endpoint / Software installation",
+    "summary": "[Golden 024] Approved software installed on managed endpoint - case 2",
+    "requester": "Synthetic User 024",
+    "requester_email": "synthetic.user024@example.invalid",
+    "department": "Sales",
+    "location": "Dublin",
+    "environment": "Production",
+    "opened_date": "2025-03-16",
+    "completed_date": "2025-03-19",
+    "request": "The user requested an approved software package that was not present on the managed workstation.",
+    "business_justification": "Provide the supported tool required for the user's assigned work.",
+    "checks": [
+      "Confirmed the device was corporate-managed and compliant.",
+      "Verified software approval, license availability, and platform compatibility.",
+      "Checked that no conflicting or unsupported version was installed."
+    ],
+    "resolution_steps": [
+      "Deployed the signed package through endpoint management.",
+      "Applied the standard configuration and security policy.",
+      "Recorded the installed version and license allocation."
+    ],
+    "validation": [
+      "Application launched successfully under the user's account.",
+      "Endpoint protection reported no finding.",
+      "User completed the documented functional smoke test."
+    ],
+    "resolution_code": "Fulfilled - supported software installed",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-024",
+      "software-install",
+      "endpoint",
+      "license",
+      "case-variant-2"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-025",
+    "category": "Access / Active Directory group",
+    "summary": "[Golden 025] Active Directory group membership granted - case 2",
+    "requester": "Synthetic User 025",
+    "requester_email": "synthetic.user025@example.invalid",
+    "department": "Operations",
+    "location": "Edinburgh",
+    "environment": "Test",
+    "opened_date": "2025-03-19",
+    "completed_date": "2025-03-20",
+    "request": "The user needed membership in a controlled directory group for an approved resource.",
+    "business_justification": "Grant narrowly scoped access required by the user's current role.",
+    "checks": [
+      "Validated group owner and line-manager approval.",
+      "Reviewed nested-group impact and privileged-access classification.",
+      "Confirmed no conflicting entitlement was present."
+    ],
+    "resolution_steps": [
+      "Added the user to the approved group.",
+      "Recorded the access owner and review date.",
+      "Triggered directory synchronization and refreshed the user session."
+    ],
+    "validation": [
+      "Effective membership was visible on the target resource.",
+      "User accessed the approved resource only.",
+      "Access-review evidence contained the new membership."
+    ],
+    "resolution_code": "Fulfilled - directory group membership assigned",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-025",
+      "active-directory",
+      "group-membership",
+      "access",
+      "case-variant-2"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-026",
+    "category": "Change / Production project move",
+    "summary": "[Golden 026] Approved project release promoted to production - case 2",
+    "requester": "Synthetic User 026",
+    "requester_email": "synthetic.user026@example.invalid",
+    "department": "Finance",
+    "location": "London",
+    "environment": "Corporate",
+    "opened_date": "2025-03-22",
+    "completed_date": "2025-03-24",
+    "request": "A tested project release required controlled promotion from staging to production.",
+    "business_justification": "Deliver an approved production change while preserving rollback and auditability.",
+    "checks": [
+      "Verified change approval, maintenance window, test evidence, and business owner sign-off.",
+      "Confirmed backups, deployment artifact checksum, dependencies, and rollback plan.",
+      "Checked monitoring health and absence of conflicting production changes."
+    ],
+    "resolution_steps": [
+      "Placed the service in the approved change window.",
+      "Promoted the immutable release artifact using the deployment runbook.",
+      "Applied configuration, ran migrations, and retained the previous release for rollback."
+    ],
+    "validation": [
+      "Smoke tests and health checks passed.",
+      "Business owner validated the critical user journey.",
+      "Monitoring remained normal and the change record was closed."
+    ],
+    "resolution_code": "Successful - production deployment validated",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-026",
+      "production-change",
+      "deployment",
+      "change-management",
+      "case-variant-2"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-027",
+    "category": "Network / VPN access",
+    "summary": "[Golden 027] Remote-access VPN enabled - case 2",
+    "requester": "Synthetic User 027",
+    "requester_email": "synthetic.user027@example.invalid",
+    "department": "Engineering",
+    "location": "Manchester",
+    "environment": "Staging",
+    "opened_date": "2025-03-25",
+    "completed_date": "2025-03-28",
+    "request": "The user required remote access to approved internal services from a managed device.",
+    "business_justification": "Support authorized remote work without exposing unrestricted network access.",
+    "checks": [
+      "Confirmed employment status, manager approval, and device compliance.",
+      "Verified MFA enrollment and the required network access profile.",
+      "Checked for an existing suspended or duplicate VPN entitlement."
+    ],
+    "resolution_steps": [
+      "Assigned the restricted VPN profile.",
+      "Installed the managed client configuration.",
+      "Registered the entitlement for periodic access review."
+    ],
+    "validation": [
+      "User connected with MFA from the managed endpoint.",
+      "Only approved network routes were reachable.",
+      "Authentication and tunnel logs showed a successful compliant session."
+    ],
+    "resolution_code": "Fulfilled - restricted VPN access enabled",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-027",
+      "vpn",
+      "remote-access",
+      "network",
+      "case-variant-2"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-028",
+    "category": "Identity / MFA replacement",
+    "summary": "[Golden 028] MFA method replaced after device change - case 2",
+    "requester": "Synthetic User 028",
+    "requester_email": "synthetic.user028@example.invalid",
+    "department": "Customer Support",
+    "location": "Remote UK",
+    "environment": "Development",
+    "opened_date": "2025-03-28",
+    "completed_date": "2025-03-29",
+    "request": "The user replaced or lost the registered authentication device and could not complete MFA.",
+    "business_justification": "Restore secure authentication after verifying the account holder.",
+    "checks": [
+      "Completed enhanced identity verification.",
+      "Reviewed recent sign-ins and confirmed the old device was no longer trusted.",
+      "Checked that the request was not associated with an active security incident."
+    ],
+    "resolution_steps": [
+      "Revoked the old MFA registration and active sessions.",
+      "Issued a time-limited registration method.",
+      "Registered the replacement authenticator and required a new sign-in."
+    ],
+    "validation": [
+      "User completed MFA with the replacement device.",
+      "The old method no longer authenticated.",
+      "The identity audit log recorded revocation and registration."
+    ],
+    "resolution_code": "Solved - MFA securely re-registered",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-028",
+      "mfa",
+      "device-replacement",
+      "identity",
+      "case-variant-2"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-029",
+    "category": "Data / Database read access",
+    "summary": "[Golden 029] Read-only database access granted - case 2",
+    "requester": "Synthetic User 029",
+    "requester_email": "synthetic.user029@example.invalid",
+    "department": "Sales",
+    "location": "Dublin",
+    "environment": "Production",
+    "opened_date": "2025-03-31",
+    "completed_date": "2025-04-02",
+    "request": "An analyst required read-only access to an approved reporting database and schema.",
+    "business_justification": "Enable reporting while preventing data modification and unnecessary data exposure.",
+    "checks": [
+      "Confirmed data-owner and manager approval.",
+      "Reviewed data classification and mandatory training.",
+      "Validated that the requested schema and duration matched the business need."
+    ],
+    "resolution_steps": [
+      "Created or mapped the user to the read-only database role.",
+      "Restricted connectivity to the approved network path.",
+      "Recorded the grant, owner, scope, and expiry in the access register."
+    ],
+    "validation": [
+      "A permitted SELECT query succeeded.",
+      "INSERT, UPDATE, DELETE, and administrative operations were denied.",
+      "Audit logging captured the test session."
+    ],
+    "resolution_code": "Fulfilled - scoped read-only data access granted",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-029",
+      "database",
+      "read-only",
+      "data-access",
+      "case-variant-2"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-030",
+    "category": "Messaging / Shared mailbox",
+    "summary": "[Golden 030] Shared mailbox access configured - case 2",
+    "requester": "Synthetic User 030",
+    "requester_email": "synthetic.user030@example.invalid",
+    "department": "Operations",
+    "location": "Edinburgh",
+    "environment": "Test",
+    "opened_date": "2025-04-03",
+    "completed_date": "2025-04-06",
+    "request": "The user required access to a team mailbox for an approved operational responsibility.",
+    "business_justification": "Allow the team to manage shared correspondence with accountable permissions.",
+    "checks": [
+      "Confirmed mailbox owner and manager approval.",
+      "Validated whether read/manage or send-as permission was required.",
+      "Checked for conflicting delegation and retention restrictions."
+    ],
+    "resolution_steps": [
+      "Granted only the approved mailbox permissions.",
+      "Applied the standard automapping setting.",
+      "Recorded the delegate and review date."
+    ],
+    "validation": [
+      "Mailbox appeared in the user's client after token refresh.",
+      "The user could perform approved actions only.",
+      "Mailbox audit logging recorded the validation action."
+    ],
+    "resolution_code": "Fulfilled - shared mailbox delegation applied",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-030",
+      "shared-mailbox",
+      "messaging",
+      "delegation",
+      "case-variant-2"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-031",
+    "category": "Messaging / Distribution list",
+    "summary": "[Golden 031] Distribution list membership updated - case 2",
+    "requester": "Synthetic User 031",
+    "requester_email": "synthetic.user031@example.invalid",
+    "department": "Finance",
+    "location": "London",
+    "environment": "Corporate",
+    "opened_date": "2025-04-06",
+    "completed_date": "2025-04-07",
+    "request": "The user needed membership in a controlled business distribution list.",
+    "business_justification": "Ensure the user receives role-relevant operational communications.",
+    "checks": [
+      "Confirmed list owner approval and membership criteria.",
+      "Verified that the address was active and not already nested in the list.",
+      "Checked restrictions for confidential or regulated communications."
+    ],
+    "resolution_steps": [
+      "Added the user as a direct member of the approved list.",
+      "Triggered directory synchronization.",
+      "Documented ownership and the next review date."
+    ],
+    "validation": [
+      "Membership was visible in the directory.",
+      "A controlled test message was delivered.",
+      "No unintended distribution lists were added."
+    ],
+    "resolution_code": "Fulfilled - distribution membership updated",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-031",
+      "distribution-list",
+      "messaging",
+      "membership",
+      "case-variant-2"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-032",
+    "category": "Endpoint / Hardware replacement",
+    "summary": "[Golden 032] Faulty managed laptop replaced - case 2",
+    "requester": "Synthetic User 032",
+    "requester_email": "synthetic.user032@example.invalid",
+    "department": "Engineering",
+    "location": "Manchester",
+    "environment": "Staging",
+    "opened_date": "2025-04-09",
+    "completed_date": "2025-04-11",
+    "request": "The managed laptop had a confirmed hardware fault that prevented reliable work.",
+    "business_justification": "Restore productivity while preserving corporate data and asset accountability.",
+    "checks": [
+      "Confirmed the hardware diagnosis and warranty status.",
+      "Verified backup or approved data-recovery status.",
+      "Matched an available replacement to the user's role profile."
+    ],
+    "resolution_steps": [
+      "Prepared the replacement with the standard managed image.",
+      "Restored approved user data and required applications.",
+      "Transferred asset ownership and quarantined the faulty device for repair or secure disposal."
+    ],
+    "validation": [
+      "Device compliance, encryption, endpoint protection, and patching were healthy.",
+      "User completed sign-in and application smoke tests.",
+      "Asset inventory reflected both the replacement and returned device."
+    ],
+    "resolution_code": "Solved - compliant replacement device issued",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-032",
+      "hardware",
+      "laptop",
+      "asset-management",
+      "case-variant-2"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-033",
+    "category": "License / SaaS allocation",
+    "summary": "[Golden 033] SaaS product license allocated - case 2",
+    "requester": "Synthetic User 033",
+    "requester_email": "synthetic.user033@example.invalid",
+    "department": "Customer Support",
+    "location": "Remote UK",
+    "environment": "Development",
+    "opened_date": "2025-04-12",
+    "completed_date": "2025-04-15",
+    "request": "The user required a licensed SaaS product for an approved role responsibility.",
+    "business_justification": "Provide required functionality while controlling recurring license cost.",
+    "checks": [
+      "Confirmed manager approval and product eligibility.",
+      "Checked available license inventory and duplicate subscriptions.",
+      "Verified that a lower-cost role would not satisfy the requirement."
+    ],
+    "resolution_steps": [
+      "Allocated the minimum suitable license tier.",
+      "Assigned the standard security and sharing policy.",
+      "Recorded the cost center and license-review date."
+    ],
+    "validation": [
+      "User accessed the licensed features.",
+      "The license console showed one active assignment.",
+      "No duplicate license remained allocated."
+    ],
+    "resolution_code": "Fulfilled - approved license allocated",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-033",
+      "license",
+      "saas",
+      "cost-control",
+      "case-variant-2"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-034",
+    "category": "Identity / Service account",
+    "summary": "[Golden 034] Service account provisioned with controlled credentials - case 2",
+    "requester": "Synthetic User 034",
+    "requester_email": "synthetic.user034@example.invalid",
+    "department": "Sales",
+    "location": "Dublin",
+    "environment": "Production",
+    "opened_date": "2025-04-15",
+    "completed_date": "2025-04-16",
+    "request": "An approved workload required a non-interactive identity for a defined integration.",
+    "business_justification": "Enable automation with traceable ownership and minimum privileges.",
+    "checks": [
+      "Confirmed application-owner and security approval.",
+      "Documented purpose, owner, environments, required permissions, and expiry.",
+      "Verified that a managed identity was unavailable or unsuitable."
+    ],
+    "resolution_steps": [
+      "Created the non-interactive account using the service naming standard.",
+      "Assigned only the approved roles and denied interactive sign-in where supported.",
+      "Stored the generated credential in the approved secrets manager with rotation metadata."
+    ],
+    "validation": [
+      "The workload authenticated and completed its permitted operation.",
+      "Interactive and unrelated resource access were denied.",
+      "Monitoring, rotation, and ownership records were present."
+    ],
+    "resolution_code": "Fulfilled - controlled service identity provisioned",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-034",
+      "service-account",
+      "automation",
+      "secrets",
+      "case-variant-2"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-035",
+    "category": "Engineering / Source repository access",
+    "summary": "[Golden 035] Repository permission granted - case 2",
+    "requester": "Synthetic User 035",
+    "requester_email": "synthetic.user035@example.invalid",
+    "department": "Operations",
+    "location": "Edinburgh",
+    "environment": "Test",
+    "opened_date": "2025-04-18",
+    "completed_date": "2025-04-20",
+    "request": "An engineer required access to a source repository for an assigned project.",
+    "business_justification": "Enable contribution while protecting branches and sensitive repositories.",
+    "checks": [
+      "Confirmed repository owner and manager approval.",
+      "Verified employment status, security training, and team membership.",
+      "Selected the minimum read or write role required."
+    ],
+    "resolution_steps": [
+      "Added the user through the approved repository team.",
+      "Applied branch protection and required-review policies.",
+      "Recorded the access grant for periodic review."
+    ],
+    "validation": [
+      "User cloned the repository and created a test branch where authorized.",
+      "Protected-branch direct push remained blocked.",
+      "Repository audit logs recorded the access change."
+    ],
+    "resolution_code": "Fulfilled - repository access granted",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-035",
+      "source-control",
+      "repository",
+      "engineering-access",
+      "case-variant-2"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-036",
+    "category": "Integration / SFTP partner access",
+    "summary": "[Golden 036] Restricted SFTP exchange access configured - case 2",
+    "requester": "Synthetic User 036",
+    "requester_email": "synthetic.user036@example.invalid",
+    "department": "Finance",
+    "location": "London",
+    "environment": "Corporate",
+    "opened_date": "2025-04-21",
+    "completed_date": "2025-04-24",
+    "request": "An approved partner exchange required access to a dedicated SFTP location.",
+    "business_justification": "Transfer agreed files through a controlled, auditable channel.",
+    "checks": [
+      "Confirmed data-owner, security, and partner approval.",
+      "Validated data classification, source IPs, retention, and exchange path.",
+      "Verified a unique account and SSH public key were supplied."
+    ],
+    "resolution_steps": [
+      "Created a chrooted account restricted to the approved directory.",
+      "Installed the partner public key and source-IP restriction.",
+      "Enabled transfer logging, retention, and expiration controls."
+    ],
+    "validation": [
+      "A test upload and download succeeded in the approved path.",
+      "Parent and peer directories were inaccessible.",
+      "Transfer and authentication events appeared in monitoring."
+    ],
+    "resolution_code": "Fulfilled - restricted file exchange enabled",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-036",
+      "sftp",
+      "partner",
+      "file-transfer",
+      "case-variant-2"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-037",
+    "category": "Network / Firewall rule",
+    "summary": "[Golden 037] Approved firewall connectivity enabled - case 2",
+    "requester": "Synthetic User 037",
+    "requester_email": "synthetic.user037@example.invalid",
+    "department": "Engineering",
+    "location": "Manchester",
+    "environment": "Staging",
+    "opened_date": "2025-04-24",
+    "completed_date": "2025-04-25",
+    "request": "An application required a specific source-to-destination network flow that was blocked.",
+    "business_justification": "Enable an approved service dependency without creating broad network exposure.",
+    "checks": [
+      "Confirmed application owner and security approval.",
+      "Validated source, destination, protocol, port, environment, and expiry.",
+      "Reviewed overlap, threat exposure, and an available rollback plan."
+    ],
+    "resolution_steps": [
+      "Created the narrow firewall rule in the approved change window.",
+      "Attached logging and the documented expiration date.",
+      "Committed the policy and monitored deployment health."
+    ],
+    "validation": [
+      "The intended TCP connection succeeded.",
+      "Unapproved ports and sources remained blocked.",
+      "Firewall logs showed only the expected test traffic."
+    ],
+    "resolution_code": "Successful - least-privilege network flow enabled",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-037",
+      "firewall",
+      "network",
+      "change-management",
+      "case-variant-2"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-038",
+    "category": "Identity / Offboarding",
+    "summary": "[Golden 038] Departed user access removed - case 2",
+    "requester": "Synthetic User 038",
+    "requester_email": "synthetic.user038@example.invalid",
+    "department": "Customer Support",
+    "location": "Remote UK",
+    "environment": "Development",
+    "opened_date": "2025-04-27",
+    "completed_date": "2025-04-29",
+    "request": "HR submitted an approved termination or departure event for a user account.",
+    "business_justification": "Remove access on time while preserving required business records and legal holds.",
+    "checks": [
+      "Validated the HR event, effective time, manager, and legal-hold requirements.",
+      "Collected the user's accounts, privileged roles, devices, sessions, and owned resources.",
+      "Confirmed mailbox and file-transfer instructions with the manager."
+    ],
+    "resolution_steps": [
+      "Disabled sign-in and revoked active sessions and MFA methods.",
+      "Removed groups, licenses, tokens, VPN, and application access.",
+      "Transferred approved data ownership and updated the asset-return record."
+    ],
+    "validation": [
+      "Authentication attempts were denied after the effective time.",
+      "Access reports showed no active entitlements.",
+      "Manager and HR confirmed data transfer and asset status."
+    ],
+    "resolution_code": "Completed - access revoked and records retained",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-038",
+      "offboarding",
+      "access-revocation",
+      "identity",
+      "case-variant-2"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-039",
+    "category": "Cloud / Console access",
+    "summary": "[Golden 039] Cloud console role assigned - case 2",
+    "requester": "Synthetic User 039",
+    "requester_email": "synthetic.user039@example.invalid",
+    "department": "Sales",
+    "location": "Dublin",
+    "environment": "Production",
+    "opened_date": "2025-04-30",
+    "completed_date": "2025-05-03",
+    "request": "An engineer required console access to an approved cloud account and environment.",
+    "business_justification": "Support operational duties with time-bound, least-privilege cloud authorization.",
+    "checks": [
+      "Confirmed manager, account owner, and security approval.",
+      "Mapped requested duties to the approved role catalog.",
+      "Checked privileged-role conflicts, MFA, and training status."
+    ],
+    "resolution_steps": [
+      "Assigned the approved federated role to the engineer's access group.",
+      "Applied session duration and environment restrictions.",
+      "Recorded owner, purpose, and access-review date."
+    ],
+    "validation": [
+      "Federated sign-in with MFA succeeded.",
+      "A permitted read or deployment check succeeded.",
+      "Administrative actions outside the role remained denied and logged."
+    ],
+    "resolution_code": "Fulfilled - federated cloud role assigned",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-039",
+      "cloud",
+      "console-access",
+      "least-privilege",
+      "case-variant-2"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-040",
+    "category": "Support / Email delivery",
+    "summary": "[Golden 040] Email delivery issue diagnosed and resolved - case 2",
+    "requester": "Synthetic User 040",
+    "requester_email": "synthetic.user040@example.invalid",
+    "department": "Operations",
+    "location": "Edinburgh",
+    "environment": "Test",
+    "opened_date": "2025-05-03",
+    "completed_date": "2025-05-04",
+    "request": "Messages from an approved sender were delayed or quarantined before reaching the user.",
+    "business_justification": "Restore legitimate mail flow without weakening organization-wide protection.",
+    "checks": [
+      "Collected message ID, sender, recipient, timestamp, and expected subject.",
+      "Traced the message and reviewed authentication and filtering verdicts.",
+      "Confirmed the sender and content were legitimate with the business owner."
+    ],
+    "resolution_steps": [
+      "Corrected the narrowly scoped sender or policy configuration.",
+      "Released the validated message where policy allowed.",
+      "Retained anti-phishing, malware, and bulk-mail protections."
+    ],
+    "validation": [
+      "A new authenticated test message was delivered.",
+      "Message trace showed the expected policy result.",
+      "Unrelated spoofed test mail remained blocked."
+    ],
+    "resolution_code": "Solved - legitimate mail flow restored",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-040",
+      "email",
+      "delivery",
+      "messaging",
+      "case-variant-2"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-041",
+    "category": "Identity / Password reset",
+    "summary": "[Golden 041] Password reset and account unlock completed - case 3",
+    "requester": "Synthetic User 041",
+    "requester_email": "synthetic.user041@example.invalid",
+    "department": "Finance",
+    "location": "London",
+    "environment": "Corporate",
+    "opened_date": "2025-05-06",
+    "completed_date": "2025-05-08",
+    "request": "The user could not sign in after repeated password attempts and the directory account became locked.",
+    "business_justification": "Restore access to approved corporate services without changing the user's existing authorization.",
+    "checks": [
+      "Verified the requester through the approved identity challenge.",
+      "Confirmed the account was active and not under an HR or security hold.",
+      "Checked sign-in logs for indicators of credential abuse."
+    ],
+    "resolution_steps": [
+      "Unlocked the directory account.",
+      "Issued a temporary password through the approved secure channel.",
+      "Required password change at the next sign-in and revoked active sessions."
+    ],
+    "validation": [
+      "User signed in with the temporary credential.",
+      "User changed the password and completed MFA.",
+      "No further failed sign-ins appeared during the observation window."
+    ],
+    "resolution_code": "Solved - identity verified and access restored",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-041",
+      "password-reset",
+      "account-unlock",
+      "identity",
+      "case-variant-3"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-042",
+    "category": "Identity / New account",
+    "summary": "[Golden 042] New employee account provisioned - case 3",
+    "requester": "Synthetic User 042",
+    "requester_email": "synthetic.user042@example.invalid",
+    "department": "Engineering",
+    "location": "Manchester",
+    "environment": "Staging",
+    "opened_date": "2025-05-09",
+    "completed_date": "2025-05-12",
+    "request": "A manager requested a standard corporate account for an approved new starter.",
+    "business_justification": "Provide day-one access aligned to the employee's role and start date.",
+    "checks": [
+      "Matched the request to an approved onboarding record.",
+      "Confirmed manager, department, start date, and license availability.",
+      "Verified that no active or dormant duplicate identity existed."
+    ],
+    "resolution_steps": [
+      "Created the directory identity using the naming standard.",
+      "Assigned the baseline license and role-based groups.",
+      "Sent activation instructions to the manager through the approved channel."
+    ],
+    "validation": [
+      "Account appeared in the directory and target applications.",
+      "Manager confirmed the expected baseline access.",
+      "User completed first sign-in and MFA registration."
+    ],
+    "resolution_code": "Fulfilled - account provisioned",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-042",
+      "new-account",
+      "onboarding",
+      "identity",
+      "case-variant-3"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-043",
+    "category": "Access / Application permission",
+    "summary": "[Golden 043] Application role permission granted - case 3",
+    "requester": "Synthetic User 043",
+    "requester_email": "synthetic.user043@example.invalid",
+    "department": "Customer Support",
+    "location": "Remote UK",
+    "environment": "Development",
+    "opened_date": "2025-05-12",
+    "completed_date": "2025-05-13",
+    "request": "The user required an additional application role to perform an assigned business function.",
+    "business_justification": "Enable an approved duty while maintaining least privilege and segregation of duties.",
+    "checks": [
+      "Confirmed manager and application-owner approval.",
+      "Checked role conflicts and segregation-of-duties rules.",
+      "Verified the requested access scope and expiry date."
+    ],
+    "resolution_steps": [
+      "Assigned the least-privilege application role.",
+      "Recorded the approval reference in the access register.",
+      "Forced a fresh application session so the entitlement was re-evaluated."
+    ],
+    "validation": [
+      "User demonstrated the required function.",
+      "A prohibited administrative function remained unavailable.",
+      "Entitlement appeared in the access review report."
+    ],
+    "resolution_code": "Fulfilled - approved least-privilege role assigned",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-043",
+      "application-access",
+      "least-privilege",
+      "approval",
+      "case-variant-3"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-044",
+    "category": "Endpoint / Software installation",
+    "summary": "[Golden 044] Approved software installed on managed endpoint - case 3",
+    "requester": "Synthetic User 044",
+    "requester_email": "synthetic.user044@example.invalid",
+    "department": "Sales",
+    "location": "Dublin",
+    "environment": "Production",
+    "opened_date": "2025-05-15",
+    "completed_date": "2025-05-17",
+    "request": "The user requested an approved software package that was not present on the managed workstation.",
+    "business_justification": "Provide the supported tool required for the user's assigned work.",
+    "checks": [
+      "Confirmed the device was corporate-managed and compliant.",
+      "Verified software approval, license availability, and platform compatibility.",
+      "Checked that no conflicting or unsupported version was installed."
+    ],
+    "resolution_steps": [
+      "Deployed the signed package through endpoint management.",
+      "Applied the standard configuration and security policy.",
+      "Recorded the installed version and license allocation."
+    ],
+    "validation": [
+      "Application launched successfully under the user's account.",
+      "Endpoint protection reported no finding.",
+      "User completed the documented functional smoke test."
+    ],
+    "resolution_code": "Fulfilled - supported software installed",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-044",
+      "software-install",
+      "endpoint",
+      "license",
+      "case-variant-3"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-045",
+    "category": "Access / Active Directory group",
+    "summary": "[Golden 045] Active Directory group membership granted - case 3",
+    "requester": "Synthetic User 045",
+    "requester_email": "synthetic.user045@example.invalid",
+    "department": "Operations",
+    "location": "Edinburgh",
+    "environment": "Test",
+    "opened_date": "2025-05-18",
+    "completed_date": "2025-05-21",
+    "request": "The user needed membership in a controlled directory group for an approved resource.",
+    "business_justification": "Grant narrowly scoped access required by the user's current role.",
+    "checks": [
+      "Validated group owner and line-manager approval.",
+      "Reviewed nested-group impact and privileged-access classification.",
+      "Confirmed no conflicting entitlement was present."
+    ],
+    "resolution_steps": [
+      "Added the user to the approved group.",
+      "Recorded the access owner and review date.",
+      "Triggered directory synchronization and refreshed the user session."
+    ],
+    "validation": [
+      "Effective membership was visible on the target resource.",
+      "User accessed the approved resource only.",
+      "Access-review evidence contained the new membership."
+    ],
+    "resolution_code": "Fulfilled - directory group membership assigned",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-045",
+      "active-directory",
+      "group-membership",
+      "access",
+      "case-variant-3"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-046",
+    "category": "Change / Production project move",
+    "summary": "[Golden 046] Approved project release promoted to production - case 3",
+    "requester": "Synthetic User 046",
+    "requester_email": "synthetic.user046@example.invalid",
+    "department": "Finance",
+    "location": "London",
+    "environment": "Corporate",
+    "opened_date": "2025-05-21",
+    "completed_date": "2025-05-22",
+    "request": "A tested project release required controlled promotion from staging to production.",
+    "business_justification": "Deliver an approved production change while preserving rollback and auditability.",
+    "checks": [
+      "Verified change approval, maintenance window, test evidence, and business owner sign-off.",
+      "Confirmed backups, deployment artifact checksum, dependencies, and rollback plan.",
+      "Checked monitoring health and absence of conflicting production changes."
+    ],
+    "resolution_steps": [
+      "Placed the service in the approved change window.",
+      "Promoted the immutable release artifact using the deployment runbook.",
+      "Applied configuration, ran migrations, and retained the previous release for rollback."
+    ],
+    "validation": [
+      "Smoke tests and health checks passed.",
+      "Business owner validated the critical user journey.",
+      "Monitoring remained normal and the change record was closed."
+    ],
+    "resolution_code": "Successful - production deployment validated",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-046",
+      "production-change",
+      "deployment",
+      "change-management",
+      "case-variant-3"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-047",
+    "category": "Network / VPN access",
+    "summary": "[Golden 047] Remote-access VPN enabled - case 3",
+    "requester": "Synthetic User 047",
+    "requester_email": "synthetic.user047@example.invalid",
+    "department": "Engineering",
+    "location": "Manchester",
+    "environment": "Staging",
+    "opened_date": "2025-05-24",
+    "completed_date": "2025-05-26",
+    "request": "The user required remote access to approved internal services from a managed device.",
+    "business_justification": "Support authorized remote work without exposing unrestricted network access.",
+    "checks": [
+      "Confirmed employment status, manager approval, and device compliance.",
+      "Verified MFA enrollment and the required network access profile.",
+      "Checked for an existing suspended or duplicate VPN entitlement."
+    ],
+    "resolution_steps": [
+      "Assigned the restricted VPN profile.",
+      "Installed the managed client configuration.",
+      "Registered the entitlement for periodic access review."
+    ],
+    "validation": [
+      "User connected with MFA from the managed endpoint.",
+      "Only approved network routes were reachable.",
+      "Authentication and tunnel logs showed a successful compliant session."
+    ],
+    "resolution_code": "Fulfilled - restricted VPN access enabled",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-047",
+      "vpn",
+      "remote-access",
+      "network",
+      "case-variant-3"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-048",
+    "category": "Identity / MFA replacement",
+    "summary": "[Golden 048] MFA method replaced after device change - case 3",
+    "requester": "Synthetic User 048",
+    "requester_email": "synthetic.user048@example.invalid",
+    "department": "Customer Support",
+    "location": "Remote UK",
+    "environment": "Development",
+    "opened_date": "2025-05-27",
+    "completed_date": "2025-05-30",
+    "request": "The user replaced or lost the registered authentication device and could not complete MFA.",
+    "business_justification": "Restore secure authentication after verifying the account holder.",
+    "checks": [
+      "Completed enhanced identity verification.",
+      "Reviewed recent sign-ins and confirmed the old device was no longer trusted.",
+      "Checked that the request was not associated with an active security incident."
+    ],
+    "resolution_steps": [
+      "Revoked the old MFA registration and active sessions.",
+      "Issued a time-limited registration method.",
+      "Registered the replacement authenticator and required a new sign-in."
+    ],
+    "validation": [
+      "User completed MFA with the replacement device.",
+      "The old method no longer authenticated.",
+      "The identity audit log recorded revocation and registration."
+    ],
+    "resolution_code": "Solved - MFA securely re-registered",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-048",
+      "mfa",
+      "device-replacement",
+      "identity",
+      "case-variant-3"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-049",
+    "category": "Data / Database read access",
+    "summary": "[Golden 049] Read-only database access granted - case 3",
+    "requester": "Synthetic User 049",
+    "requester_email": "synthetic.user049@example.invalid",
+    "department": "Sales",
+    "location": "Dublin",
+    "environment": "Production",
+    "opened_date": "2025-05-30",
+    "completed_date": "2025-05-31",
+    "request": "An analyst required read-only access to an approved reporting database and schema.",
+    "business_justification": "Enable reporting while preventing data modification and unnecessary data exposure.",
+    "checks": [
+      "Confirmed data-owner and manager approval.",
+      "Reviewed data classification and mandatory training.",
+      "Validated that the requested schema and duration matched the business need."
+    ],
+    "resolution_steps": [
+      "Created or mapped the user to the read-only database role.",
+      "Restricted connectivity to the approved network path.",
+      "Recorded the grant, owner, scope, and expiry in the access register."
+    ],
+    "validation": [
+      "A permitted SELECT query succeeded.",
+      "INSERT, UPDATE, DELETE, and administrative operations were denied.",
+      "Audit logging captured the test session."
+    ],
+    "resolution_code": "Fulfilled - scoped read-only data access granted",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-049",
+      "database",
+      "read-only",
+      "data-access",
+      "case-variant-3"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-050",
+    "category": "Messaging / Shared mailbox",
+    "summary": "[Golden 050] Shared mailbox access configured - case 3",
+    "requester": "Synthetic User 050",
+    "requester_email": "synthetic.user050@example.invalid",
+    "department": "Operations",
+    "location": "Edinburgh",
+    "environment": "Test",
+    "opened_date": "2025-06-02",
+    "completed_date": "2025-06-04",
+    "request": "The user required access to a team mailbox for an approved operational responsibility.",
+    "business_justification": "Allow the team to manage shared correspondence with accountable permissions.",
+    "checks": [
+      "Confirmed mailbox owner and manager approval.",
+      "Validated whether read/manage or send-as permission was required.",
+      "Checked for conflicting delegation and retention restrictions."
+    ],
+    "resolution_steps": [
+      "Granted only the approved mailbox permissions.",
+      "Applied the standard automapping setting.",
+      "Recorded the delegate and review date."
+    ],
+    "validation": [
+      "Mailbox appeared in the user's client after token refresh.",
+      "The user could perform approved actions only.",
+      "Mailbox audit logging recorded the validation action."
+    ],
+    "resolution_code": "Fulfilled - shared mailbox delegation applied",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-050",
+      "shared-mailbox",
+      "messaging",
+      "delegation",
+      "case-variant-3"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-051",
+    "category": "Messaging / Distribution list",
+    "summary": "[Golden 051] Distribution list membership updated - case 3",
+    "requester": "Synthetic User 051",
+    "requester_email": "synthetic.user051@example.invalid",
+    "department": "Finance",
+    "location": "London",
+    "environment": "Corporate",
+    "opened_date": "2025-06-05",
+    "completed_date": "2025-06-08",
+    "request": "The user needed membership in a controlled business distribution list.",
+    "business_justification": "Ensure the user receives role-relevant operational communications.",
+    "checks": [
+      "Confirmed list owner approval and membership criteria.",
+      "Verified that the address was active and not already nested in the list.",
+      "Checked restrictions for confidential or regulated communications."
+    ],
+    "resolution_steps": [
+      "Added the user as a direct member of the approved list.",
+      "Triggered directory synchronization.",
+      "Documented ownership and the next review date."
+    ],
+    "validation": [
+      "Membership was visible in the directory.",
+      "A controlled test message was delivered.",
+      "No unintended distribution lists were added."
+    ],
+    "resolution_code": "Fulfilled - distribution membership updated",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-051",
+      "distribution-list",
+      "messaging",
+      "membership",
+      "case-variant-3"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-052",
+    "category": "Endpoint / Hardware replacement",
+    "summary": "[Golden 052] Faulty managed laptop replaced - case 3",
+    "requester": "Synthetic User 052",
+    "requester_email": "synthetic.user052@example.invalid",
+    "department": "Engineering",
+    "location": "Manchester",
+    "environment": "Staging",
+    "opened_date": "2025-06-08",
+    "completed_date": "2025-06-09",
+    "request": "The managed laptop had a confirmed hardware fault that prevented reliable work.",
+    "business_justification": "Restore productivity while preserving corporate data and asset accountability.",
+    "checks": [
+      "Confirmed the hardware diagnosis and warranty status.",
+      "Verified backup or approved data-recovery status.",
+      "Matched an available replacement to the user's role profile."
+    ],
+    "resolution_steps": [
+      "Prepared the replacement with the standard managed image.",
+      "Restored approved user data and required applications.",
+      "Transferred asset ownership and quarantined the faulty device for repair or secure disposal."
+    ],
+    "validation": [
+      "Device compliance, encryption, endpoint protection, and patching were healthy.",
+      "User completed sign-in and application smoke tests.",
+      "Asset inventory reflected both the replacement and returned device."
+    ],
+    "resolution_code": "Solved - compliant replacement device issued",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-052",
+      "hardware",
+      "laptop",
+      "asset-management",
+      "case-variant-3"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-053",
+    "category": "License / SaaS allocation",
+    "summary": "[Golden 053] SaaS product license allocated - case 3",
+    "requester": "Synthetic User 053",
+    "requester_email": "synthetic.user053@example.invalid",
+    "department": "Customer Support",
+    "location": "Remote UK",
+    "environment": "Development",
+    "opened_date": "2025-06-11",
+    "completed_date": "2025-06-13",
+    "request": "The user required a licensed SaaS product for an approved role responsibility.",
+    "business_justification": "Provide required functionality while controlling recurring license cost.",
+    "checks": [
+      "Confirmed manager approval and product eligibility.",
+      "Checked available license inventory and duplicate subscriptions.",
+      "Verified that a lower-cost role would not satisfy the requirement."
+    ],
+    "resolution_steps": [
+      "Allocated the minimum suitable license tier.",
+      "Assigned the standard security and sharing policy.",
+      "Recorded the cost center and license-review date."
+    ],
+    "validation": [
+      "User accessed the licensed features.",
+      "The license console showed one active assignment.",
+      "No duplicate license remained allocated."
+    ],
+    "resolution_code": "Fulfilled - approved license allocated",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-053",
+      "license",
+      "saas",
+      "cost-control",
+      "case-variant-3"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-054",
+    "category": "Identity / Service account",
+    "summary": "[Golden 054] Service account provisioned with controlled credentials - case 3",
+    "requester": "Synthetic User 054",
+    "requester_email": "synthetic.user054@example.invalid",
+    "department": "Sales",
+    "location": "Dublin",
+    "environment": "Production",
+    "opened_date": "2025-06-14",
+    "completed_date": "2025-06-17",
+    "request": "An approved workload required a non-interactive identity for a defined integration.",
+    "business_justification": "Enable automation with traceable ownership and minimum privileges.",
+    "checks": [
+      "Confirmed application-owner and security approval.",
+      "Documented purpose, owner, environments, required permissions, and expiry.",
+      "Verified that a managed identity was unavailable or unsuitable."
+    ],
+    "resolution_steps": [
+      "Created the non-interactive account using the service naming standard.",
+      "Assigned only the approved roles and denied interactive sign-in where supported.",
+      "Stored the generated credential in the approved secrets manager with rotation metadata."
+    ],
+    "validation": [
+      "The workload authenticated and completed its permitted operation.",
+      "Interactive and unrelated resource access were denied.",
+      "Monitoring, rotation, and ownership records were present."
+    ],
+    "resolution_code": "Fulfilled - controlled service identity provisioned",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-054",
+      "service-account",
+      "automation",
+      "secrets",
+      "case-variant-3"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-055",
+    "category": "Engineering / Source repository access",
+    "summary": "[Golden 055] Repository permission granted - case 3",
+    "requester": "Synthetic User 055",
+    "requester_email": "synthetic.user055@example.invalid",
+    "department": "Operations",
+    "location": "Edinburgh",
+    "environment": "Test",
+    "opened_date": "2025-06-17",
+    "completed_date": "2025-06-18",
+    "request": "An engineer required access to a source repository for an assigned project.",
+    "business_justification": "Enable contribution while protecting branches and sensitive repositories.",
+    "checks": [
+      "Confirmed repository owner and manager approval.",
+      "Verified employment status, security training, and team membership.",
+      "Selected the minimum read or write role required."
+    ],
+    "resolution_steps": [
+      "Added the user through the approved repository team.",
+      "Applied branch protection and required-review policies.",
+      "Recorded the access grant for periodic review."
+    ],
+    "validation": [
+      "User cloned the repository and created a test branch where authorized.",
+      "Protected-branch direct push remained blocked.",
+      "Repository audit logs recorded the access change."
+    ],
+    "resolution_code": "Fulfilled - repository access granted",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-055",
+      "source-control",
+      "repository",
+      "engineering-access",
+      "case-variant-3"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-056",
+    "category": "Integration / SFTP partner access",
+    "summary": "[Golden 056] Restricted SFTP exchange access configured - case 3",
+    "requester": "Synthetic User 056",
+    "requester_email": "synthetic.user056@example.invalid",
+    "department": "Finance",
+    "location": "London",
+    "environment": "Corporate",
+    "opened_date": "2025-06-20",
+    "completed_date": "2025-06-22",
+    "request": "An approved partner exchange required access to a dedicated SFTP location.",
+    "business_justification": "Transfer agreed files through a controlled, auditable channel.",
+    "checks": [
+      "Confirmed data-owner, security, and partner approval.",
+      "Validated data classification, source IPs, retention, and exchange path.",
+      "Verified a unique account and SSH public key were supplied."
+    ],
+    "resolution_steps": [
+      "Created a chrooted account restricted to the approved directory.",
+      "Installed the partner public key and source-IP restriction.",
+      "Enabled transfer logging, retention, and expiration controls."
+    ],
+    "validation": [
+      "A test upload and download succeeded in the approved path.",
+      "Parent and peer directories were inaccessible.",
+      "Transfer and authentication events appeared in monitoring."
+    ],
+    "resolution_code": "Fulfilled - restricted file exchange enabled",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-056",
+      "sftp",
+      "partner",
+      "file-transfer",
+      "case-variant-3"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-057",
+    "category": "Network / Firewall rule",
+    "summary": "[Golden 057] Approved firewall connectivity enabled - case 3",
+    "requester": "Synthetic User 057",
+    "requester_email": "synthetic.user057@example.invalid",
+    "department": "Engineering",
+    "location": "Manchester",
+    "environment": "Staging",
+    "opened_date": "2025-06-23",
+    "completed_date": "2025-06-26",
+    "request": "An application required a specific source-to-destination network flow that was blocked.",
+    "business_justification": "Enable an approved service dependency without creating broad network exposure.",
+    "checks": [
+      "Confirmed application owner and security approval.",
+      "Validated source, destination, protocol, port, environment, and expiry.",
+      "Reviewed overlap, threat exposure, and an available rollback plan."
+    ],
+    "resolution_steps": [
+      "Created the narrow firewall rule in the approved change window.",
+      "Attached logging and the documented expiration date.",
+      "Committed the policy and monitored deployment health."
+    ],
+    "validation": [
+      "The intended TCP connection succeeded.",
+      "Unapproved ports and sources remained blocked.",
+      "Firewall logs showed only the expected test traffic."
+    ],
+    "resolution_code": "Successful - least-privilege network flow enabled",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-057",
+      "firewall",
+      "network",
+      "change-management",
+      "case-variant-3"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-058",
+    "category": "Identity / Offboarding",
+    "summary": "[Golden 058] Departed user access removed - case 3",
+    "requester": "Synthetic User 058",
+    "requester_email": "synthetic.user058@example.invalid",
+    "department": "Customer Support",
+    "location": "Remote UK",
+    "environment": "Development",
+    "opened_date": "2025-06-26",
+    "completed_date": "2025-06-27",
+    "request": "HR submitted an approved termination or departure event for a user account.",
+    "business_justification": "Remove access on time while preserving required business records and legal holds.",
+    "checks": [
+      "Validated the HR event, effective time, manager, and legal-hold requirements.",
+      "Collected the user's accounts, privileged roles, devices, sessions, and owned resources.",
+      "Confirmed mailbox and file-transfer instructions with the manager."
+    ],
+    "resolution_steps": [
+      "Disabled sign-in and revoked active sessions and MFA methods.",
+      "Removed groups, licenses, tokens, VPN, and application access.",
+      "Transferred approved data ownership and updated the asset-return record."
+    ],
+    "validation": [
+      "Authentication attempts were denied after the effective time.",
+      "Access reports showed no active entitlements.",
+      "Manager and HR confirmed data transfer and asset status."
+    ],
+    "resolution_code": "Completed - access revoked and records retained",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-058",
+      "offboarding",
+      "access-revocation",
+      "identity",
+      "case-variant-3"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-059",
+    "category": "Cloud / Console access",
+    "summary": "[Golden 059] Cloud console role assigned - case 3",
+    "requester": "Synthetic User 059",
+    "requester_email": "synthetic.user059@example.invalid",
+    "department": "Sales",
+    "location": "Dublin",
+    "environment": "Production",
+    "opened_date": "2025-06-29",
+    "completed_date": "2025-07-01",
+    "request": "An engineer required console access to an approved cloud account and environment.",
+    "business_justification": "Support operational duties with time-bound, least-privilege cloud authorization.",
+    "checks": [
+      "Confirmed manager, account owner, and security approval.",
+      "Mapped requested duties to the approved role catalog.",
+      "Checked privileged-role conflicts, MFA, and training status."
+    ],
+    "resolution_steps": [
+      "Assigned the approved federated role to the engineer's access group.",
+      "Applied session duration and environment restrictions.",
+      "Recorded owner, purpose, and access-review date."
+    ],
+    "validation": [
+      "Federated sign-in with MFA succeeded.",
+      "A permitted read or deployment check succeeded.",
+      "Administrative actions outside the role remained denied and logged."
+    ],
+    "resolution_code": "Fulfilled - federated cloud role assigned",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-059",
+      "cloud",
+      "console-access",
+      "least-privilege",
+      "case-variant-3"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-060",
+    "category": "Support / Email delivery",
+    "summary": "[Golden 060] Email delivery issue diagnosed and resolved - case 3",
+    "requester": "Synthetic User 060",
+    "requester_email": "synthetic.user060@example.invalid",
+    "department": "Operations",
+    "location": "Edinburgh",
+    "environment": "Test",
+    "opened_date": "2025-07-02",
+    "completed_date": "2025-07-05",
+    "request": "Messages from an approved sender were delayed or quarantined before reaching the user.",
+    "business_justification": "Restore legitimate mail flow without weakening organization-wide protection.",
+    "checks": [
+      "Collected message ID, sender, recipient, timestamp, and expected subject.",
+      "Traced the message and reviewed authentication and filtering verdicts.",
+      "Confirmed the sender and content were legitimate with the business owner."
+    ],
+    "resolution_steps": [
+      "Corrected the narrowly scoped sender or policy configuration.",
+      "Released the validated message where policy allowed.",
+      "Retained anti-phishing, malware, and bulk-mail protections."
+    ],
+    "validation": [
+      "A new authenticated test message was delivered.",
+      "Message trace showed the expected policy result.",
+      "Unrelated spoofed test mail remained blocked."
+    ],
+    "resolution_code": "Solved - legitimate mail flow restored",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-060",
+      "email",
+      "delivery",
+      "messaging",
+      "case-variant-3"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-061",
+    "category": "Identity / Password reset",
+    "summary": "[Golden 061] Password reset and account unlock completed - case 4",
+    "requester": "Synthetic User 061",
+    "requester_email": "synthetic.user061@example.invalid",
+    "department": "Finance",
+    "location": "London",
+    "environment": "Corporate",
+    "opened_date": "2025-07-05",
+    "completed_date": "2025-07-06",
+    "request": "The user could not sign in after repeated password attempts and the directory account became locked.",
+    "business_justification": "Restore access to approved corporate services without changing the user's existing authorization.",
+    "checks": [
+      "Verified the requester through the approved identity challenge.",
+      "Confirmed the account was active and not under an HR or security hold.",
+      "Checked sign-in logs for indicators of credential abuse."
+    ],
+    "resolution_steps": [
+      "Unlocked the directory account.",
+      "Issued a temporary password through the approved secure channel.",
+      "Required password change at the next sign-in and revoked active sessions."
+    ],
+    "validation": [
+      "User signed in with the temporary credential.",
+      "User changed the password and completed MFA.",
+      "No further failed sign-ins appeared during the observation window."
+    ],
+    "resolution_code": "Solved - identity verified and access restored",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-061",
+      "password-reset",
+      "account-unlock",
+      "identity",
+      "case-variant-4"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-062",
+    "category": "Identity / New account",
+    "summary": "[Golden 062] New employee account provisioned - case 4",
+    "requester": "Synthetic User 062",
+    "requester_email": "synthetic.user062@example.invalid",
+    "department": "Engineering",
+    "location": "Manchester",
+    "environment": "Staging",
+    "opened_date": "2025-07-08",
+    "completed_date": "2025-07-10",
+    "request": "A manager requested a standard corporate account for an approved new starter.",
+    "business_justification": "Provide day-one access aligned to the employee's role and start date.",
+    "checks": [
+      "Matched the request to an approved onboarding record.",
+      "Confirmed manager, department, start date, and license availability.",
+      "Verified that no active or dormant duplicate identity existed."
+    ],
+    "resolution_steps": [
+      "Created the directory identity using the naming standard.",
+      "Assigned the baseline license and role-based groups.",
+      "Sent activation instructions to the manager through the approved channel."
+    ],
+    "validation": [
+      "Account appeared in the directory and target applications.",
+      "Manager confirmed the expected baseline access.",
+      "User completed first sign-in and MFA registration."
+    ],
+    "resolution_code": "Fulfilled - account provisioned",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-062",
+      "new-account",
+      "onboarding",
+      "identity",
+      "case-variant-4"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-063",
+    "category": "Access / Application permission",
+    "summary": "[Golden 063] Application role permission granted - case 4",
+    "requester": "Synthetic User 063",
+    "requester_email": "synthetic.user063@example.invalid",
+    "department": "Customer Support",
+    "location": "Remote UK",
+    "environment": "Development",
+    "opened_date": "2025-07-11",
+    "completed_date": "2025-07-14",
+    "request": "The user required an additional application role to perform an assigned business function.",
+    "business_justification": "Enable an approved duty while maintaining least privilege and segregation of duties.",
+    "checks": [
+      "Confirmed manager and application-owner approval.",
+      "Checked role conflicts and segregation-of-duties rules.",
+      "Verified the requested access scope and expiry date."
+    ],
+    "resolution_steps": [
+      "Assigned the least-privilege application role.",
+      "Recorded the approval reference in the access register.",
+      "Forced a fresh application session so the entitlement was re-evaluated."
+    ],
+    "validation": [
+      "User demonstrated the required function.",
+      "A prohibited administrative function remained unavailable.",
+      "Entitlement appeared in the access review report."
+    ],
+    "resolution_code": "Fulfilled - approved least-privilege role assigned",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-063",
+      "application-access",
+      "least-privilege",
+      "approval",
+      "case-variant-4"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-064",
+    "category": "Endpoint / Software installation",
+    "summary": "[Golden 064] Approved software installed on managed endpoint - case 4",
+    "requester": "Synthetic User 064",
+    "requester_email": "synthetic.user064@example.invalid",
+    "department": "Sales",
+    "location": "Dublin",
+    "environment": "Production",
+    "opened_date": "2025-07-14",
+    "completed_date": "2025-07-15",
+    "request": "The user requested an approved software package that was not present on the managed workstation.",
+    "business_justification": "Provide the supported tool required for the user's assigned work.",
+    "checks": [
+      "Confirmed the device was corporate-managed and compliant.",
+      "Verified software approval, license availability, and platform compatibility.",
+      "Checked that no conflicting or unsupported version was installed."
+    ],
+    "resolution_steps": [
+      "Deployed the signed package through endpoint management.",
+      "Applied the standard configuration and security policy.",
+      "Recorded the installed version and license allocation."
+    ],
+    "validation": [
+      "Application launched successfully under the user's account.",
+      "Endpoint protection reported no finding.",
+      "User completed the documented functional smoke test."
+    ],
+    "resolution_code": "Fulfilled - supported software installed",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-064",
+      "software-install",
+      "endpoint",
+      "license",
+      "case-variant-4"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-065",
+    "category": "Access / Active Directory group",
+    "summary": "[Golden 065] Active Directory group membership granted - case 4",
+    "requester": "Synthetic User 065",
+    "requester_email": "synthetic.user065@example.invalid",
+    "department": "Operations",
+    "location": "Edinburgh",
+    "environment": "Test",
+    "opened_date": "2025-07-17",
+    "completed_date": "2025-07-19",
+    "request": "The user needed membership in a controlled directory group for an approved resource.",
+    "business_justification": "Grant narrowly scoped access required by the user's current role.",
+    "checks": [
+      "Validated group owner and line-manager approval.",
+      "Reviewed nested-group impact and privileged-access classification.",
+      "Confirmed no conflicting entitlement was present."
+    ],
+    "resolution_steps": [
+      "Added the user to the approved group.",
+      "Recorded the access owner and review date.",
+      "Triggered directory synchronization and refreshed the user session."
+    ],
+    "validation": [
+      "Effective membership was visible on the target resource.",
+      "User accessed the approved resource only.",
+      "Access-review evidence contained the new membership."
+    ],
+    "resolution_code": "Fulfilled - directory group membership assigned",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-065",
+      "active-directory",
+      "group-membership",
+      "access",
+      "case-variant-4"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-066",
+    "category": "Change / Production project move",
+    "summary": "[Golden 066] Approved project release promoted to production - case 4",
+    "requester": "Synthetic User 066",
+    "requester_email": "synthetic.user066@example.invalid",
+    "department": "Finance",
+    "location": "London",
+    "environment": "Corporate",
+    "opened_date": "2025-07-20",
+    "completed_date": "2025-07-23",
+    "request": "A tested project release required controlled promotion from staging to production.",
+    "business_justification": "Deliver an approved production change while preserving rollback and auditability.",
+    "checks": [
+      "Verified change approval, maintenance window, test evidence, and business owner sign-off.",
+      "Confirmed backups, deployment artifact checksum, dependencies, and rollback plan.",
+      "Checked monitoring health and absence of conflicting production changes."
+    ],
+    "resolution_steps": [
+      "Placed the service in the approved change window.",
+      "Promoted the immutable release artifact using the deployment runbook.",
+      "Applied configuration, ran migrations, and retained the previous release for rollback."
+    ],
+    "validation": [
+      "Smoke tests and health checks passed.",
+      "Business owner validated the critical user journey.",
+      "Monitoring remained normal and the change record was closed."
+    ],
+    "resolution_code": "Successful - production deployment validated",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-066",
+      "production-change",
+      "deployment",
+      "change-management",
+      "case-variant-4"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-067",
+    "category": "Network / VPN access",
+    "summary": "[Golden 067] Remote-access VPN enabled - case 4",
+    "requester": "Synthetic User 067",
+    "requester_email": "synthetic.user067@example.invalid",
+    "department": "Engineering",
+    "location": "Manchester",
+    "environment": "Staging",
+    "opened_date": "2025-07-23",
+    "completed_date": "2025-07-24",
+    "request": "The user required remote access to approved internal services from a managed device.",
+    "business_justification": "Support authorized remote work without exposing unrestricted network access.",
+    "checks": [
+      "Confirmed employment status, manager approval, and device compliance.",
+      "Verified MFA enrollment and the required network access profile.",
+      "Checked for an existing suspended or duplicate VPN entitlement."
+    ],
+    "resolution_steps": [
+      "Assigned the restricted VPN profile.",
+      "Installed the managed client configuration.",
+      "Registered the entitlement for periodic access review."
+    ],
+    "validation": [
+      "User connected with MFA from the managed endpoint.",
+      "Only approved network routes were reachable.",
+      "Authentication and tunnel logs showed a successful compliant session."
+    ],
+    "resolution_code": "Fulfilled - restricted VPN access enabled",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-067",
+      "vpn",
+      "remote-access",
+      "network",
+      "case-variant-4"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-068",
+    "category": "Identity / MFA replacement",
+    "summary": "[Golden 068] MFA method replaced after device change - case 4",
+    "requester": "Synthetic User 068",
+    "requester_email": "synthetic.user068@example.invalid",
+    "department": "Customer Support",
+    "location": "Remote UK",
+    "environment": "Development",
+    "opened_date": "2025-07-26",
+    "completed_date": "2025-07-28",
+    "request": "The user replaced or lost the registered authentication device and could not complete MFA.",
+    "business_justification": "Restore secure authentication after verifying the account holder.",
+    "checks": [
+      "Completed enhanced identity verification.",
+      "Reviewed recent sign-ins and confirmed the old device was no longer trusted.",
+      "Checked that the request was not associated with an active security incident."
+    ],
+    "resolution_steps": [
+      "Revoked the old MFA registration and active sessions.",
+      "Issued a time-limited registration method.",
+      "Registered the replacement authenticator and required a new sign-in."
+    ],
+    "validation": [
+      "User completed MFA with the replacement device.",
+      "The old method no longer authenticated.",
+      "The identity audit log recorded revocation and registration."
+    ],
+    "resolution_code": "Solved - MFA securely re-registered",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-068",
+      "mfa",
+      "device-replacement",
+      "identity",
+      "case-variant-4"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-069",
+    "category": "Data / Database read access",
+    "summary": "[Golden 069] Read-only database access granted - case 4",
+    "requester": "Synthetic User 069",
+    "requester_email": "synthetic.user069@example.invalid",
+    "department": "Sales",
+    "location": "Dublin",
+    "environment": "Production",
+    "opened_date": "2025-07-29",
+    "completed_date": "2025-08-01",
+    "request": "An analyst required read-only access to an approved reporting database and schema.",
+    "business_justification": "Enable reporting while preventing data modification and unnecessary data exposure.",
+    "checks": [
+      "Confirmed data-owner and manager approval.",
+      "Reviewed data classification and mandatory training.",
+      "Validated that the requested schema and duration matched the business need."
+    ],
+    "resolution_steps": [
+      "Created or mapped the user to the read-only database role.",
+      "Restricted connectivity to the approved network path.",
+      "Recorded the grant, owner, scope, and expiry in the access register."
+    ],
+    "validation": [
+      "A permitted SELECT query succeeded.",
+      "INSERT, UPDATE, DELETE, and administrative operations were denied.",
+      "Audit logging captured the test session."
+    ],
+    "resolution_code": "Fulfilled - scoped read-only data access granted",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-069",
+      "database",
+      "read-only",
+      "data-access",
+      "case-variant-4"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-070",
+    "category": "Messaging / Shared mailbox",
+    "summary": "[Golden 070] Shared mailbox access configured - case 4",
+    "requester": "Synthetic User 070",
+    "requester_email": "synthetic.user070@example.invalid",
+    "department": "Operations",
+    "location": "Edinburgh",
+    "environment": "Test",
+    "opened_date": "2025-08-01",
+    "completed_date": "2025-08-02",
+    "request": "The user required access to a team mailbox for an approved operational responsibility.",
+    "business_justification": "Allow the team to manage shared correspondence with accountable permissions.",
+    "checks": [
+      "Confirmed mailbox owner and manager approval.",
+      "Validated whether read/manage or send-as permission was required.",
+      "Checked for conflicting delegation and retention restrictions."
+    ],
+    "resolution_steps": [
+      "Granted only the approved mailbox permissions.",
+      "Applied the standard automapping setting.",
+      "Recorded the delegate and review date."
+    ],
+    "validation": [
+      "Mailbox appeared in the user's client after token refresh.",
+      "The user could perform approved actions only.",
+      "Mailbox audit logging recorded the validation action."
+    ],
+    "resolution_code": "Fulfilled - shared mailbox delegation applied",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-070",
+      "shared-mailbox",
+      "messaging",
+      "delegation",
+      "case-variant-4"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-071",
+    "category": "Messaging / Distribution list",
+    "summary": "[Golden 071] Distribution list membership updated - case 4",
+    "requester": "Synthetic User 071",
+    "requester_email": "synthetic.user071@example.invalid",
+    "department": "Finance",
+    "location": "London",
+    "environment": "Corporate",
+    "opened_date": "2025-08-04",
+    "completed_date": "2025-08-06",
+    "request": "The user needed membership in a controlled business distribution list.",
+    "business_justification": "Ensure the user receives role-relevant operational communications.",
+    "checks": [
+      "Confirmed list owner approval and membership criteria.",
+      "Verified that the address was active and not already nested in the list.",
+      "Checked restrictions for confidential or regulated communications."
+    ],
+    "resolution_steps": [
+      "Added the user as a direct member of the approved list.",
+      "Triggered directory synchronization.",
+      "Documented ownership and the next review date."
+    ],
+    "validation": [
+      "Membership was visible in the directory.",
+      "A controlled test message was delivered.",
+      "No unintended distribution lists were added."
+    ],
+    "resolution_code": "Fulfilled - distribution membership updated",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-071",
+      "distribution-list",
+      "messaging",
+      "membership",
+      "case-variant-4"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-072",
+    "category": "Endpoint / Hardware replacement",
+    "summary": "[Golden 072] Faulty managed laptop replaced - case 4",
+    "requester": "Synthetic User 072",
+    "requester_email": "synthetic.user072@example.invalid",
+    "department": "Engineering",
+    "location": "Manchester",
+    "environment": "Staging",
+    "opened_date": "2025-08-07",
+    "completed_date": "2025-08-10",
+    "request": "The managed laptop had a confirmed hardware fault that prevented reliable work.",
+    "business_justification": "Restore productivity while preserving corporate data and asset accountability.",
+    "checks": [
+      "Confirmed the hardware diagnosis and warranty status.",
+      "Verified backup or approved data-recovery status.",
+      "Matched an available replacement to the user's role profile."
+    ],
+    "resolution_steps": [
+      "Prepared the replacement with the standard managed image.",
+      "Restored approved user data and required applications.",
+      "Transferred asset ownership and quarantined the faulty device for repair or secure disposal."
+    ],
+    "validation": [
+      "Device compliance, encryption, endpoint protection, and patching were healthy.",
+      "User completed sign-in and application smoke tests.",
+      "Asset inventory reflected both the replacement and returned device."
+    ],
+    "resolution_code": "Solved - compliant replacement device issued",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-072",
+      "hardware",
+      "laptop",
+      "asset-management",
+      "case-variant-4"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-073",
+    "category": "License / SaaS allocation",
+    "summary": "[Golden 073] SaaS product license allocated - case 4",
+    "requester": "Synthetic User 073",
+    "requester_email": "synthetic.user073@example.invalid",
+    "department": "Customer Support",
+    "location": "Remote UK",
+    "environment": "Development",
+    "opened_date": "2025-08-10",
+    "completed_date": "2025-08-11",
+    "request": "The user required a licensed SaaS product for an approved role responsibility.",
+    "business_justification": "Provide required functionality while controlling recurring license cost.",
+    "checks": [
+      "Confirmed manager approval and product eligibility.",
+      "Checked available license inventory and duplicate subscriptions.",
+      "Verified that a lower-cost role would not satisfy the requirement."
+    ],
+    "resolution_steps": [
+      "Allocated the minimum suitable license tier.",
+      "Assigned the standard security and sharing policy.",
+      "Recorded the cost center and license-review date."
+    ],
+    "validation": [
+      "User accessed the licensed features.",
+      "The license console showed one active assignment.",
+      "No duplicate license remained allocated."
+    ],
+    "resolution_code": "Fulfilled - approved license allocated",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-073",
+      "license",
+      "saas",
+      "cost-control",
+      "case-variant-4"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-074",
+    "category": "Identity / Service account",
+    "summary": "[Golden 074] Service account provisioned with controlled credentials - case 4",
+    "requester": "Synthetic User 074",
+    "requester_email": "synthetic.user074@example.invalid",
+    "department": "Sales",
+    "location": "Dublin",
+    "environment": "Production",
+    "opened_date": "2025-08-13",
+    "completed_date": "2025-08-15",
+    "request": "An approved workload required a non-interactive identity for a defined integration.",
+    "business_justification": "Enable automation with traceable ownership and minimum privileges.",
+    "checks": [
+      "Confirmed application-owner and security approval.",
+      "Documented purpose, owner, environments, required permissions, and expiry.",
+      "Verified that a managed identity was unavailable or unsuitable."
+    ],
+    "resolution_steps": [
+      "Created the non-interactive account using the service naming standard.",
+      "Assigned only the approved roles and denied interactive sign-in where supported.",
+      "Stored the generated credential in the approved secrets manager with rotation metadata."
+    ],
+    "validation": [
+      "The workload authenticated and completed its permitted operation.",
+      "Interactive and unrelated resource access were denied.",
+      "Monitoring, rotation, and ownership records were present."
+    ],
+    "resolution_code": "Fulfilled - controlled service identity provisioned",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-074",
+      "service-account",
+      "automation",
+      "secrets",
+      "case-variant-4"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-075",
+    "category": "Engineering / Source repository access",
+    "summary": "[Golden 075] Repository permission granted - case 4",
+    "requester": "Synthetic User 075",
+    "requester_email": "synthetic.user075@example.invalid",
+    "department": "Operations",
+    "location": "Edinburgh",
+    "environment": "Test",
+    "opened_date": "2025-08-16",
+    "completed_date": "2025-08-19",
+    "request": "An engineer required access to a source repository for an assigned project.",
+    "business_justification": "Enable contribution while protecting branches and sensitive repositories.",
+    "checks": [
+      "Confirmed repository owner and manager approval.",
+      "Verified employment status, security training, and team membership.",
+      "Selected the minimum read or write role required."
+    ],
+    "resolution_steps": [
+      "Added the user through the approved repository team.",
+      "Applied branch protection and required-review policies.",
+      "Recorded the access grant for periodic review."
+    ],
+    "validation": [
+      "User cloned the repository and created a test branch where authorized.",
+      "Protected-branch direct push remained blocked.",
+      "Repository audit logs recorded the access change."
+    ],
+    "resolution_code": "Fulfilled - repository access granted",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-075",
+      "source-control",
+      "repository",
+      "engineering-access",
+      "case-variant-4"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-076",
+    "category": "Integration / SFTP partner access",
+    "summary": "[Golden 076] Restricted SFTP exchange access configured - case 4",
+    "requester": "Synthetic User 076",
+    "requester_email": "synthetic.user076@example.invalid",
+    "department": "Finance",
+    "location": "London",
+    "environment": "Corporate",
+    "opened_date": "2025-08-19",
+    "completed_date": "2025-08-20",
+    "request": "An approved partner exchange required access to a dedicated SFTP location.",
+    "business_justification": "Transfer agreed files through a controlled, auditable channel.",
+    "checks": [
+      "Confirmed data-owner, security, and partner approval.",
+      "Validated data classification, source IPs, retention, and exchange path.",
+      "Verified a unique account and SSH public key were supplied."
+    ],
+    "resolution_steps": [
+      "Created a chrooted account restricted to the approved directory.",
+      "Installed the partner public key and source-IP restriction.",
+      "Enabled transfer logging, retention, and expiration controls."
+    ],
+    "validation": [
+      "A test upload and download succeeded in the approved path.",
+      "Parent and peer directories were inaccessible.",
+      "Transfer and authentication events appeared in monitoring."
+    ],
+    "resolution_code": "Fulfilled - restricted file exchange enabled",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-076",
+      "sftp",
+      "partner",
+      "file-transfer",
+      "case-variant-4"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-077",
+    "category": "Network / Firewall rule",
+    "summary": "[Golden 077] Approved firewall connectivity enabled - case 4",
+    "requester": "Synthetic User 077",
+    "requester_email": "synthetic.user077@example.invalid",
+    "department": "Engineering",
+    "location": "Manchester",
+    "environment": "Staging",
+    "opened_date": "2025-08-22",
+    "completed_date": "2025-08-24",
+    "request": "An application required a specific source-to-destination network flow that was blocked.",
+    "business_justification": "Enable an approved service dependency without creating broad network exposure.",
+    "checks": [
+      "Confirmed application owner and security approval.",
+      "Validated source, destination, protocol, port, environment, and expiry.",
+      "Reviewed overlap, threat exposure, and an available rollback plan."
+    ],
+    "resolution_steps": [
+      "Created the narrow firewall rule in the approved change window.",
+      "Attached logging and the documented expiration date.",
+      "Committed the policy and monitored deployment health."
+    ],
+    "validation": [
+      "The intended TCP connection succeeded.",
+      "Unapproved ports and sources remained blocked.",
+      "Firewall logs showed only the expected test traffic."
+    ],
+    "resolution_code": "Successful - least-privilege network flow enabled",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-077",
+      "firewall",
+      "network",
+      "change-management",
+      "case-variant-4"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-078",
+    "category": "Identity / Offboarding",
+    "summary": "[Golden 078] Departed user access removed - case 4",
+    "requester": "Synthetic User 078",
+    "requester_email": "synthetic.user078@example.invalid",
+    "department": "Customer Support",
+    "location": "Remote UK",
+    "environment": "Development",
+    "opened_date": "2025-08-25",
+    "completed_date": "2025-08-28",
+    "request": "HR submitted an approved termination or departure event for a user account.",
+    "business_justification": "Remove access on time while preserving required business records and legal holds.",
+    "checks": [
+      "Validated the HR event, effective time, manager, and legal-hold requirements.",
+      "Collected the user's accounts, privileged roles, devices, sessions, and owned resources.",
+      "Confirmed mailbox and file-transfer instructions with the manager."
+    ],
+    "resolution_steps": [
+      "Disabled sign-in and revoked active sessions and MFA methods.",
+      "Removed groups, licenses, tokens, VPN, and application access.",
+      "Transferred approved data ownership and updated the asset-return record."
+    ],
+    "validation": [
+      "Authentication attempts were denied after the effective time.",
+      "Access reports showed no active entitlements.",
+      "Manager and HR confirmed data transfer and asset status."
+    ],
+    "resolution_code": "Completed - access revoked and records retained",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-078",
+      "offboarding",
+      "access-revocation",
+      "identity",
+      "case-variant-4"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-079",
+    "category": "Cloud / Console access",
+    "summary": "[Golden 079] Cloud console role assigned - case 4",
+    "requester": "Synthetic User 079",
+    "requester_email": "synthetic.user079@example.invalid",
+    "department": "Sales",
+    "location": "Dublin",
+    "environment": "Production",
+    "opened_date": "2025-08-28",
+    "completed_date": "2025-08-29",
+    "request": "An engineer required console access to an approved cloud account and environment.",
+    "business_justification": "Support operational duties with time-bound, least-privilege cloud authorization.",
+    "checks": [
+      "Confirmed manager, account owner, and security approval.",
+      "Mapped requested duties to the approved role catalog.",
+      "Checked privileged-role conflicts, MFA, and training status."
+    ],
+    "resolution_steps": [
+      "Assigned the approved federated role to the engineer's access group.",
+      "Applied session duration and environment restrictions.",
+      "Recorded owner, purpose, and access-review date."
+    ],
+    "validation": [
+      "Federated sign-in with MFA succeeded.",
+      "A permitted read or deployment check succeeded.",
+      "Administrative actions outside the role remained denied and logged."
+    ],
+    "resolution_code": "Fulfilled - federated cloud role assigned",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-079",
+      "cloud",
+      "console-access",
+      "least-privilege",
+      "case-variant-4"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-080",
+    "category": "Support / Email delivery",
+    "summary": "[Golden 080] Email delivery issue diagnosed and resolved - case 4",
+    "requester": "Synthetic User 080",
+    "requester_email": "synthetic.user080@example.invalid",
+    "department": "Operations",
+    "location": "Edinburgh",
+    "environment": "Test",
+    "opened_date": "2025-08-31",
+    "completed_date": "2025-09-02",
+    "request": "Messages from an approved sender were delayed or quarantined before reaching the user.",
+    "business_justification": "Restore legitimate mail flow without weakening organization-wide protection.",
+    "checks": [
+      "Collected message ID, sender, recipient, timestamp, and expected subject.",
+      "Traced the message and reviewed authentication and filtering verdicts.",
+      "Confirmed the sender and content were legitimate with the business owner."
+    ],
+    "resolution_steps": [
+      "Corrected the narrowly scoped sender or policy configuration.",
+      "Released the validated message where policy allowed.",
+      "Retained anti-phishing, malware, and bulk-mail protections."
+    ],
+    "validation": [
+      "A new authenticated test message was delivered.",
+      "Message trace showed the expected policy result.",
+      "Unrelated spoofed test mail remained blocked."
+    ],
+    "resolution_code": "Solved - legitimate mail flow restored",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-080",
+      "email",
+      "delivery",
+      "messaging",
+      "case-variant-4"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-081",
+    "category": "Identity / Password reset",
+    "summary": "[Golden 081] Password reset and account unlock completed - case 5",
+    "requester": "Synthetic User 081",
+    "requester_email": "synthetic.user081@example.invalid",
+    "department": "Finance",
+    "location": "London",
+    "environment": "Corporate",
+    "opened_date": "2025-09-03",
+    "completed_date": "2025-09-06",
+    "request": "The user could not sign in after repeated password attempts and the directory account became locked.",
+    "business_justification": "Restore access to approved corporate services without changing the user's existing authorization.",
+    "checks": [
+      "Verified the requester through the approved identity challenge.",
+      "Confirmed the account was active and not under an HR or security hold.",
+      "Checked sign-in logs for indicators of credential abuse."
+    ],
+    "resolution_steps": [
+      "Unlocked the directory account.",
+      "Issued a temporary password through the approved secure channel.",
+      "Required password change at the next sign-in and revoked active sessions."
+    ],
+    "validation": [
+      "User signed in with the temporary credential.",
+      "User changed the password and completed MFA.",
+      "No further failed sign-ins appeared during the observation window."
+    ],
+    "resolution_code": "Solved - identity verified and access restored",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-081",
+      "password-reset",
+      "account-unlock",
+      "identity",
+      "case-variant-5"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-082",
+    "category": "Identity / New account",
+    "summary": "[Golden 082] New employee account provisioned - case 5",
+    "requester": "Synthetic User 082",
+    "requester_email": "synthetic.user082@example.invalid",
+    "department": "Engineering",
+    "location": "Manchester",
+    "environment": "Staging",
+    "opened_date": "2025-09-06",
+    "completed_date": "2025-09-07",
+    "request": "A manager requested a standard corporate account for an approved new starter.",
+    "business_justification": "Provide day-one access aligned to the employee's role and start date.",
+    "checks": [
+      "Matched the request to an approved onboarding record.",
+      "Confirmed manager, department, start date, and license availability.",
+      "Verified that no active or dormant duplicate identity existed."
+    ],
+    "resolution_steps": [
+      "Created the directory identity using the naming standard.",
+      "Assigned the baseline license and role-based groups.",
+      "Sent activation instructions to the manager through the approved channel."
+    ],
+    "validation": [
+      "Account appeared in the directory and target applications.",
+      "Manager confirmed the expected baseline access.",
+      "User completed first sign-in and MFA registration."
+    ],
+    "resolution_code": "Fulfilled - account provisioned",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-082",
+      "new-account",
+      "onboarding",
+      "identity",
+      "case-variant-5"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-083",
+    "category": "Access / Application permission",
+    "summary": "[Golden 083] Application role permission granted - case 5",
+    "requester": "Synthetic User 083",
+    "requester_email": "synthetic.user083@example.invalid",
+    "department": "Customer Support",
+    "location": "Remote UK",
+    "environment": "Development",
+    "opened_date": "2025-09-09",
+    "completed_date": "2025-09-11",
+    "request": "The user required an additional application role to perform an assigned business function.",
+    "business_justification": "Enable an approved duty while maintaining least privilege and segregation of duties.",
+    "checks": [
+      "Confirmed manager and application-owner approval.",
+      "Checked role conflicts and segregation-of-duties rules.",
+      "Verified the requested access scope and expiry date."
+    ],
+    "resolution_steps": [
+      "Assigned the least-privilege application role.",
+      "Recorded the approval reference in the access register.",
+      "Forced a fresh application session so the entitlement was re-evaluated."
+    ],
+    "validation": [
+      "User demonstrated the required function.",
+      "A prohibited administrative function remained unavailable.",
+      "Entitlement appeared in the access review report."
+    ],
+    "resolution_code": "Fulfilled - approved least-privilege role assigned",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-083",
+      "application-access",
+      "least-privilege",
+      "approval",
+      "case-variant-5"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-084",
+    "category": "Endpoint / Software installation",
+    "summary": "[Golden 084] Approved software installed on managed endpoint - case 5",
+    "requester": "Synthetic User 084",
+    "requester_email": "synthetic.user084@example.invalid",
+    "department": "Sales",
+    "location": "Dublin",
+    "environment": "Production",
+    "opened_date": "2025-09-12",
+    "completed_date": "2025-09-15",
+    "request": "The user requested an approved software package that was not present on the managed workstation.",
+    "business_justification": "Provide the supported tool required for the user's assigned work.",
+    "checks": [
+      "Confirmed the device was corporate-managed and compliant.",
+      "Verified software approval, license availability, and platform compatibility.",
+      "Checked that no conflicting or unsupported version was installed."
+    ],
+    "resolution_steps": [
+      "Deployed the signed package through endpoint management.",
+      "Applied the standard configuration and security policy.",
+      "Recorded the installed version and license allocation."
+    ],
+    "validation": [
+      "Application launched successfully under the user's account.",
+      "Endpoint protection reported no finding.",
+      "User completed the documented functional smoke test."
+    ],
+    "resolution_code": "Fulfilled - supported software installed",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-084",
+      "software-install",
+      "endpoint",
+      "license",
+      "case-variant-5"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-085",
+    "category": "Access / Active Directory group",
+    "summary": "[Golden 085] Active Directory group membership granted - case 5",
+    "requester": "Synthetic User 085",
+    "requester_email": "synthetic.user085@example.invalid",
+    "department": "Operations",
+    "location": "Edinburgh",
+    "environment": "Test",
+    "opened_date": "2025-09-15",
+    "completed_date": "2025-09-16",
+    "request": "The user needed membership in a controlled directory group for an approved resource.",
+    "business_justification": "Grant narrowly scoped access required by the user's current role.",
+    "checks": [
+      "Validated group owner and line-manager approval.",
+      "Reviewed nested-group impact and privileged-access classification.",
+      "Confirmed no conflicting entitlement was present."
+    ],
+    "resolution_steps": [
+      "Added the user to the approved group.",
+      "Recorded the access owner and review date.",
+      "Triggered directory synchronization and refreshed the user session."
+    ],
+    "validation": [
+      "Effective membership was visible on the target resource.",
+      "User accessed the approved resource only.",
+      "Access-review evidence contained the new membership."
+    ],
+    "resolution_code": "Fulfilled - directory group membership assigned",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-085",
+      "active-directory",
+      "group-membership",
+      "access",
+      "case-variant-5"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-086",
+    "category": "Change / Production project move",
+    "summary": "[Golden 086] Approved project release promoted to production - case 5",
+    "requester": "Synthetic User 086",
+    "requester_email": "synthetic.user086@example.invalid",
+    "department": "Finance",
+    "location": "London",
+    "environment": "Corporate",
+    "opened_date": "2025-09-18",
+    "completed_date": "2025-09-20",
+    "request": "A tested project release required controlled promotion from staging to production.",
+    "business_justification": "Deliver an approved production change while preserving rollback and auditability.",
+    "checks": [
+      "Verified change approval, maintenance window, test evidence, and business owner sign-off.",
+      "Confirmed backups, deployment artifact checksum, dependencies, and rollback plan.",
+      "Checked monitoring health and absence of conflicting production changes."
+    ],
+    "resolution_steps": [
+      "Placed the service in the approved change window.",
+      "Promoted the immutable release artifact using the deployment runbook.",
+      "Applied configuration, ran migrations, and retained the previous release for rollback."
+    ],
+    "validation": [
+      "Smoke tests and health checks passed.",
+      "Business owner validated the critical user journey.",
+      "Monitoring remained normal and the change record was closed."
+    ],
+    "resolution_code": "Successful - production deployment validated",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-086",
+      "production-change",
+      "deployment",
+      "change-management",
+      "case-variant-5"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-087",
+    "category": "Network / VPN access",
+    "summary": "[Golden 087] Remote-access VPN enabled - case 5",
+    "requester": "Synthetic User 087",
+    "requester_email": "synthetic.user087@example.invalid",
+    "department": "Engineering",
+    "location": "Manchester",
+    "environment": "Staging",
+    "opened_date": "2025-09-21",
+    "completed_date": "2025-09-24",
+    "request": "The user required remote access to approved internal services from a managed device.",
+    "business_justification": "Support authorized remote work without exposing unrestricted network access.",
+    "checks": [
+      "Confirmed employment status, manager approval, and device compliance.",
+      "Verified MFA enrollment and the required network access profile.",
+      "Checked for an existing suspended or duplicate VPN entitlement."
+    ],
+    "resolution_steps": [
+      "Assigned the restricted VPN profile.",
+      "Installed the managed client configuration.",
+      "Registered the entitlement for periodic access review."
+    ],
+    "validation": [
+      "User connected with MFA from the managed endpoint.",
+      "Only approved network routes were reachable.",
+      "Authentication and tunnel logs showed a successful compliant session."
+    ],
+    "resolution_code": "Fulfilled - restricted VPN access enabled",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-087",
+      "vpn",
+      "remote-access",
+      "network",
+      "case-variant-5"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-088",
+    "category": "Identity / MFA replacement",
+    "summary": "[Golden 088] MFA method replaced after device change - case 5",
+    "requester": "Synthetic User 088",
+    "requester_email": "synthetic.user088@example.invalid",
+    "department": "Customer Support",
+    "location": "Remote UK",
+    "environment": "Development",
+    "opened_date": "2025-09-24",
+    "completed_date": "2025-09-25",
+    "request": "The user replaced or lost the registered authentication device and could not complete MFA.",
+    "business_justification": "Restore secure authentication after verifying the account holder.",
+    "checks": [
+      "Completed enhanced identity verification.",
+      "Reviewed recent sign-ins and confirmed the old device was no longer trusted.",
+      "Checked that the request was not associated with an active security incident."
+    ],
+    "resolution_steps": [
+      "Revoked the old MFA registration and active sessions.",
+      "Issued a time-limited registration method.",
+      "Registered the replacement authenticator and required a new sign-in."
+    ],
+    "validation": [
+      "User completed MFA with the replacement device.",
+      "The old method no longer authenticated.",
+      "The identity audit log recorded revocation and registration."
+    ],
+    "resolution_code": "Solved - MFA securely re-registered",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-088",
+      "mfa",
+      "device-replacement",
+      "identity",
+      "case-variant-5"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-089",
+    "category": "Data / Database read access",
+    "summary": "[Golden 089] Read-only database access granted - case 5",
+    "requester": "Synthetic User 089",
+    "requester_email": "synthetic.user089@example.invalid",
+    "department": "Sales",
+    "location": "Dublin",
+    "environment": "Production",
+    "opened_date": "2025-09-27",
+    "completed_date": "2025-09-29",
+    "request": "An analyst required read-only access to an approved reporting database and schema.",
+    "business_justification": "Enable reporting while preventing data modification and unnecessary data exposure.",
+    "checks": [
+      "Confirmed data-owner and manager approval.",
+      "Reviewed data classification and mandatory training.",
+      "Validated that the requested schema and duration matched the business need."
+    ],
+    "resolution_steps": [
+      "Created or mapped the user to the read-only database role.",
+      "Restricted connectivity to the approved network path.",
+      "Recorded the grant, owner, scope, and expiry in the access register."
+    ],
+    "validation": [
+      "A permitted SELECT query succeeded.",
+      "INSERT, UPDATE, DELETE, and administrative operations were denied.",
+      "Audit logging captured the test session."
+    ],
+    "resolution_code": "Fulfilled - scoped read-only data access granted",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-089",
+      "database",
+      "read-only",
+      "data-access",
+      "case-variant-5"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-090",
+    "category": "Messaging / Shared mailbox",
+    "summary": "[Golden 090] Shared mailbox access configured - case 5",
+    "requester": "Synthetic User 090",
+    "requester_email": "synthetic.user090@example.invalid",
+    "department": "Operations",
+    "location": "Edinburgh",
+    "environment": "Test",
+    "opened_date": "2025-09-30",
+    "completed_date": "2025-10-03",
+    "request": "The user required access to a team mailbox for an approved operational responsibility.",
+    "business_justification": "Allow the team to manage shared correspondence with accountable permissions.",
+    "checks": [
+      "Confirmed mailbox owner and manager approval.",
+      "Validated whether read/manage or send-as permission was required.",
+      "Checked for conflicting delegation and retention restrictions."
+    ],
+    "resolution_steps": [
+      "Granted only the approved mailbox permissions.",
+      "Applied the standard automapping setting.",
+      "Recorded the delegate and review date."
+    ],
+    "validation": [
+      "Mailbox appeared in the user's client after token refresh.",
+      "The user could perform approved actions only.",
+      "Mailbox audit logging recorded the validation action."
+    ],
+    "resolution_code": "Fulfilled - shared mailbox delegation applied",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-090",
+      "shared-mailbox",
+      "messaging",
+      "delegation",
+      "case-variant-5"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-091",
+    "category": "Messaging / Distribution list",
+    "summary": "[Golden 091] Distribution list membership updated - case 5",
+    "requester": "Synthetic User 091",
+    "requester_email": "synthetic.user091@example.invalid",
+    "department": "Finance",
+    "location": "London",
+    "environment": "Corporate",
+    "opened_date": "2025-10-03",
+    "completed_date": "2025-10-04",
+    "request": "The user needed membership in a controlled business distribution list.",
+    "business_justification": "Ensure the user receives role-relevant operational communications.",
+    "checks": [
+      "Confirmed list owner approval and membership criteria.",
+      "Verified that the address was active and not already nested in the list.",
+      "Checked restrictions for confidential or regulated communications."
+    ],
+    "resolution_steps": [
+      "Added the user as a direct member of the approved list.",
+      "Triggered directory synchronization.",
+      "Documented ownership and the next review date."
+    ],
+    "validation": [
+      "Membership was visible in the directory.",
+      "A controlled test message was delivered.",
+      "No unintended distribution lists were added."
+    ],
+    "resolution_code": "Fulfilled - distribution membership updated",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-091",
+      "distribution-list",
+      "messaging",
+      "membership",
+      "case-variant-5"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-092",
+    "category": "Endpoint / Hardware replacement",
+    "summary": "[Golden 092] Faulty managed laptop replaced - case 5",
+    "requester": "Synthetic User 092",
+    "requester_email": "synthetic.user092@example.invalid",
+    "department": "Engineering",
+    "location": "Manchester",
+    "environment": "Staging",
+    "opened_date": "2025-10-06",
+    "completed_date": "2025-10-08",
+    "request": "The managed laptop had a confirmed hardware fault that prevented reliable work.",
+    "business_justification": "Restore productivity while preserving corporate data and asset accountability.",
+    "checks": [
+      "Confirmed the hardware diagnosis and warranty status.",
+      "Verified backup or approved data-recovery status.",
+      "Matched an available replacement to the user's role profile."
+    ],
+    "resolution_steps": [
+      "Prepared the replacement with the standard managed image.",
+      "Restored approved user data and required applications.",
+      "Transferred asset ownership and quarantined the faulty device for repair or secure disposal."
+    ],
+    "validation": [
+      "Device compliance, encryption, endpoint protection, and patching were healthy.",
+      "User completed sign-in and application smoke tests.",
+      "Asset inventory reflected both the replacement and returned device."
+    ],
+    "resolution_code": "Solved - compliant replacement device issued",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-092",
+      "hardware",
+      "laptop",
+      "asset-management",
+      "case-variant-5"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-093",
+    "category": "License / SaaS allocation",
+    "summary": "[Golden 093] SaaS product license allocated - case 5",
+    "requester": "Synthetic User 093",
+    "requester_email": "synthetic.user093@example.invalid",
+    "department": "Customer Support",
+    "location": "Remote UK",
+    "environment": "Development",
+    "opened_date": "2025-10-09",
+    "completed_date": "2025-10-12",
+    "request": "The user required a licensed SaaS product for an approved role responsibility.",
+    "business_justification": "Provide required functionality while controlling recurring license cost.",
+    "checks": [
+      "Confirmed manager approval and product eligibility.",
+      "Checked available license inventory and duplicate subscriptions.",
+      "Verified that a lower-cost role would not satisfy the requirement."
+    ],
+    "resolution_steps": [
+      "Allocated the minimum suitable license tier.",
+      "Assigned the standard security and sharing policy.",
+      "Recorded the cost center and license-review date."
+    ],
+    "validation": [
+      "User accessed the licensed features.",
+      "The license console showed one active assignment.",
+      "No duplicate license remained allocated."
+    ],
+    "resolution_code": "Fulfilled - approved license allocated",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-093",
+      "license",
+      "saas",
+      "cost-control",
+      "case-variant-5"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-094",
+    "category": "Identity / Service account",
+    "summary": "[Golden 094] Service account provisioned with controlled credentials - case 5",
+    "requester": "Synthetic User 094",
+    "requester_email": "synthetic.user094@example.invalid",
+    "department": "Sales",
+    "location": "Dublin",
+    "environment": "Production",
+    "opened_date": "2025-10-12",
+    "completed_date": "2025-10-13",
+    "request": "An approved workload required a non-interactive identity for a defined integration.",
+    "business_justification": "Enable automation with traceable ownership and minimum privileges.",
+    "checks": [
+      "Confirmed application-owner and security approval.",
+      "Documented purpose, owner, environments, required permissions, and expiry.",
+      "Verified that a managed identity was unavailable or unsuitable."
+    ],
+    "resolution_steps": [
+      "Created the non-interactive account using the service naming standard.",
+      "Assigned only the approved roles and denied interactive sign-in where supported.",
+      "Stored the generated credential in the approved secrets manager with rotation metadata."
+    ],
+    "validation": [
+      "The workload authenticated and completed its permitted operation.",
+      "Interactive and unrelated resource access were denied.",
+      "Monitoring, rotation, and ownership records were present."
+    ],
+    "resolution_code": "Fulfilled - controlled service identity provisioned",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-094",
+      "service-account",
+      "automation",
+      "secrets",
+      "case-variant-5"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-095",
+    "category": "Engineering / Source repository access",
+    "summary": "[Golden 095] Repository permission granted - case 5",
+    "requester": "Synthetic User 095",
+    "requester_email": "synthetic.user095@example.invalid",
+    "department": "Operations",
+    "location": "Edinburgh",
+    "environment": "Test",
+    "opened_date": "2025-10-15",
+    "completed_date": "2025-10-17",
+    "request": "An engineer required access to a source repository for an assigned project.",
+    "business_justification": "Enable contribution while protecting branches and sensitive repositories.",
+    "checks": [
+      "Confirmed repository owner and manager approval.",
+      "Verified employment status, security training, and team membership.",
+      "Selected the minimum read or write role required."
+    ],
+    "resolution_steps": [
+      "Added the user through the approved repository team.",
+      "Applied branch protection and required-review policies.",
+      "Recorded the access grant for periodic review."
+    ],
+    "validation": [
+      "User cloned the repository and created a test branch where authorized.",
+      "Protected-branch direct push remained blocked.",
+      "Repository audit logs recorded the access change."
+    ],
+    "resolution_code": "Fulfilled - repository access granted",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-095",
+      "source-control",
+      "repository",
+      "engineering-access",
+      "case-variant-5"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-096",
+    "category": "Integration / SFTP partner access",
+    "summary": "[Golden 096] Restricted SFTP exchange access configured - case 5",
+    "requester": "Synthetic User 096",
+    "requester_email": "synthetic.user096@example.invalid",
+    "department": "Finance",
+    "location": "London",
+    "environment": "Corporate",
+    "opened_date": "2025-10-18",
+    "completed_date": "2025-10-21",
+    "request": "An approved partner exchange required access to a dedicated SFTP location.",
+    "business_justification": "Transfer agreed files through a controlled, auditable channel.",
+    "checks": [
+      "Confirmed data-owner, security, and partner approval.",
+      "Validated data classification, source IPs, retention, and exchange path.",
+      "Verified a unique account and SSH public key were supplied."
+    ],
+    "resolution_steps": [
+      "Created a chrooted account restricted to the approved directory.",
+      "Installed the partner public key and source-IP restriction.",
+      "Enabled transfer logging, retention, and expiration controls."
+    ],
+    "validation": [
+      "A test upload and download succeeded in the approved path.",
+      "Parent and peer directories were inaccessible.",
+      "Transfer and authentication events appeared in monitoring."
+    ],
+    "resolution_code": "Fulfilled - restricted file exchange enabled",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-096",
+      "sftp",
+      "partner",
+      "file-transfer",
+      "case-variant-5"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-097",
+    "category": "Network / Firewall rule",
+    "summary": "[Golden 097] Approved firewall connectivity enabled - case 5",
+    "requester": "Synthetic User 097",
+    "requester_email": "synthetic.user097@example.invalid",
+    "department": "Engineering",
+    "location": "Manchester",
+    "environment": "Staging",
+    "opened_date": "2025-10-21",
+    "completed_date": "2025-10-22",
+    "request": "An application required a specific source-to-destination network flow that was blocked.",
+    "business_justification": "Enable an approved service dependency without creating broad network exposure.",
+    "checks": [
+      "Confirmed application owner and security approval.",
+      "Validated source, destination, protocol, port, environment, and expiry.",
+      "Reviewed overlap, threat exposure, and an available rollback plan."
+    ],
+    "resolution_steps": [
+      "Created the narrow firewall rule in the approved change window.",
+      "Attached logging and the documented expiration date.",
+      "Committed the policy and monitored deployment health."
+    ],
+    "validation": [
+      "The intended TCP connection succeeded.",
+      "Unapproved ports and sources remained blocked.",
+      "Firewall logs showed only the expected test traffic."
+    ],
+    "resolution_code": "Successful - least-privilege network flow enabled",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-097",
+      "firewall",
+      "network",
+      "change-management",
+      "case-variant-5"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-098",
+    "category": "Identity / Offboarding",
+    "summary": "[Golden 098] Departed user access removed - case 5",
+    "requester": "Synthetic User 098",
+    "requester_email": "synthetic.user098@example.invalid",
+    "department": "Customer Support",
+    "location": "Remote UK",
+    "environment": "Development",
+    "opened_date": "2025-10-24",
+    "completed_date": "2025-10-26",
+    "request": "HR submitted an approved termination or departure event for a user account.",
+    "business_justification": "Remove access on time while preserving required business records and legal holds.",
+    "checks": [
+      "Validated the HR event, effective time, manager, and legal-hold requirements.",
+      "Collected the user's accounts, privileged roles, devices, sessions, and owned resources.",
+      "Confirmed mailbox and file-transfer instructions with the manager."
+    ],
+    "resolution_steps": [
+      "Disabled sign-in and revoked active sessions and MFA methods.",
+      "Removed groups, licenses, tokens, VPN, and application access.",
+      "Transferred approved data ownership and updated the asset-return record."
+    ],
+    "validation": [
+      "Authentication attempts were denied after the effective time.",
+      "Access reports showed no active entitlements.",
+      "Manager and HR confirmed data transfer and asset status."
+    ],
+    "resolution_code": "Completed - access revoked and records retained",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-098",
+      "offboarding",
+      "access-revocation",
+      "identity",
+      "case-variant-5"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-099",
+    "category": "Cloud / Console access",
+    "summary": "[Golden 099] Cloud console role assigned - case 5",
+    "requester": "Synthetic User 099",
+    "requester_email": "synthetic.user099@example.invalid",
+    "department": "Sales",
+    "location": "Dublin",
+    "environment": "Production",
+    "opened_date": "2025-10-27",
+    "completed_date": "2025-10-30",
+    "request": "An engineer required console access to an approved cloud account and environment.",
+    "business_justification": "Support operational duties with time-bound, least-privilege cloud authorization.",
+    "checks": [
+      "Confirmed manager, account owner, and security approval.",
+      "Mapped requested duties to the approved role catalog.",
+      "Checked privileged-role conflicts, MFA, and training status."
+    ],
+    "resolution_steps": [
+      "Assigned the approved federated role to the engineer's access group.",
+      "Applied session duration and environment restrictions.",
+      "Recorded owner, purpose, and access-review date."
+    ],
+    "validation": [
+      "Federated sign-in with MFA succeeded.",
+      "A permitted read or deployment check succeeded.",
+      "Administrative actions outside the role remained denied and logged."
+    ],
+    "resolution_code": "Fulfilled - federated cloud role assigned",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-099",
+      "cloud",
+      "console-access",
+      "least-privilege",
+      "case-variant-5"
+    ]
+  },
+  {
+    "external_id": "golden-ticket-100",
+    "category": "Support / Email delivery",
+    "summary": "[Golden 100] Email delivery issue diagnosed and resolved - case 5",
+    "requester": "Synthetic User 100",
+    "requester_email": "synthetic.user100@example.invalid",
+    "department": "Operations",
+    "location": "Edinburgh",
+    "environment": "Test",
+    "opened_date": "2025-10-30",
+    "completed_date": "2025-10-31",
+    "request": "Messages from an approved sender were delayed or quarantined before reaching the user.",
+    "business_justification": "Restore legitimate mail flow without weakening organization-wide protection.",
+    "checks": [
+      "Collected message ID, sender, recipient, timestamp, and expected subject.",
+      "Traced the message and reviewed authentication and filtering verdicts.",
+      "Confirmed the sender and content were legitimate with the business owner."
+    ],
+    "resolution_steps": [
+      "Corrected the narrowly scoped sender or policy configuration.",
+      "Released the validated message where policy allowed.",
+      "Retained anti-phishing, malware, and bulk-mail protections."
+    ],
+    "validation": [
+      "A new authenticated test message was delivered.",
+      "Message trace showed the expected policy result.",
+      "Unrelated spoofed test mail remained blocked."
+    ],
+    "resolution_code": "Solved - legitimate mail flow restored",
+    "labels": [
+      "local-agent-golden-data",
+      "golden-ticket-100",
+      "email",
+      "delivery",
+      "messaging",
+      "case-variant-5"
+    ]
+  }
+]

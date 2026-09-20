@@ -1,0 +1,32 @@
+[
+  {
+    "external_id": "local-agent-demo-001",
+    "summary": "Checkout returns duplicate payment confirmation",
+    "description": "Customers occasionally receive two confirmation messages after one card payment. Confirm whether the order and payment were duplicated.",
+    "issue_type": "Bug"
+  },
+  {
+    "external_id": "local-agent-demo-002",
+    "summary": "Damaged laptop replacement workflow",
+    "description": "Document the support workflow for a laptop delivered with a cracked display and arrange a replacement shipment.",
+    "issue_type": "Task"
+  },
+  {
+    "external_id": "local-agent-demo-003",
+    "summary": "Noise-cancelling headset intermittent audio",
+    "description": "Investigate reports that the left audio channel drops after approximately twenty minutes of use.",
+    "issue_type": "Bug"
+  },
+  {
+    "external_id": "local-agent-demo-004",
+    "summary": "Order history totals show wrong currency",
+    "description": "The customer order-history page sometimes formats GBP purchases as USD even though stored monetary amounts are correct.",
+    "issue_type": "Bug"
+  },
+  {
+    "external_id": "local-agent-demo-005",
+    "summary": "Add customer complaint escalation dashboard",
+    "description": "Create a dashboard showing open complaints, affected product, purchase value, owner, severity, and current status.",
+    "issue_type": "Story"
+  }
+]

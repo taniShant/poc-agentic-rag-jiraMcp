@@ -1,0 +1,51 @@
+{
+  "ollama": {
+    "base_url": "http://localhost:11434",
+    "chat_model": "qwen3:8b",
+    "embedding_model": "nomic-embed-text",
+    "embedding_dimensions": 768,
+    "temperature": 0.1
+  },
+  "opensearch": {
+    "url": "http://localhost:9200",
+    "index_name": "local-support-knowledge",
+    "username": "",
+    "password": "",
+    "verify_tls": false,
+    "keyword_weight": 0.5,
+    "vector_weight": 0.5
+  },
+  "postgres": {
+    "host": "localhost",
+    "port": 5432,
+    "database": "agentic_local",
+    "username": "agentic_local",
+    "password": "change-me",
+    "ssl": false
+  },
+  "jira": {
+    "enabled": false,
+    "base_url": "https://your-company.atlassian.net",
+    "email": "your-email@example.com",
+    "api_token": "replace-with-an-atlassian-api-token",
+    "project_key": "DEMO",
+    "read_only": true,
+    "sync_jql": "project = DEMO ORDER BY updated DESC",
+    "sync_limit": 100
+  },
+  "mcp": {
+    "transport": "stdio",
+    "startup_timeout_seconds": 30
+  },
+  "validation": {
+    "enabled": true,
+    "max_refinements": 2,
+    "pass_score": 4.0,
+    "min_individual_score": 3
+  },
+  "agent": {
+    "memory_messages": 12,
+    "default_session_id": "local-demo",
+    "request_timeout_seconds": 120
+  }
+}

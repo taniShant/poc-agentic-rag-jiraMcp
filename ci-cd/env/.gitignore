@@ -1,0 +1,4 @@
+# dev.json contains environment-specific credentials after its placeholder is
+# replaced. Keep it out of source control.
+dev.json
+local.json
