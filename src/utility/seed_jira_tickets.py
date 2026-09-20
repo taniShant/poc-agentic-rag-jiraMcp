@@ -18,13 +18,19 @@ def main() -> None:
     )
     arguments = parser.parse_args()
     config = load_config(arguments.config)
-    client = JiraClient(config.jira, timeout_seconds=config.agent.request_timeout_seconds)
+    client = JiraClient(
+        config.jira_mcp,
+        timeout_seconds=config.agent.request_timeout_seconds,
+    )
     fixture_path = Path(__file__).with_name("dummy_tickets.json")
     tickets = json.loads(fixture_path.read_text(encoding="utf-8"))
 
     for ticket in tickets:
         external_id = str(ticket["external_id"])
-        jql = f'project = "{config.jira.project_key}" AND labels = "{external_id}"'
+        jql = (
+            f'project = "{config.jira_mcp.project_key}" '
+            f'AND labels = "{external_id}"'
+        )
         existing = client.search(jql, max_results=1)
         if existing:
             print(f"exists  {existing[0]['issue_key']}  {ticket['summary']}")

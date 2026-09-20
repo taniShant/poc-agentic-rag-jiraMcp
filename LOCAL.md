@@ -20,7 +20,11 @@ separate, explicit command so an agent prompt cannot accidentally write to Jira.
 
 ## Components
 
-- `src/agents/jira_agent.py`: Strands agent backed by the local Ollama model.
+- `src/agents/step_1_cli_entry.py`: CLI, MCP lifecycle, memory, and idempotency.
+- `src/agents/step_2_orchestrator.py`: plan/execute/reflection coordination.
+- `src/agents/step_3_planner.py`: tool-free Strands Planner.
+- `src/agents/step_4_executor.py`: tool-enabled Strands Executor.
+- `src/agents/step_5_critic.py`: independent tool-free Strands Critic.
 - `src/vectorDb/ingestion.py`: Jira normalization, embedding, and OpenSearch
   document upserts.
 - `src/vectorDb/retrieval.py`: weighted BM25/k-NN reciprocal-rank fusion.
@@ -28,9 +32,13 @@ separate, explicit command so an agent prompt cannot accidentally write to Jira.
 - `src/vectorDb/embeddings.py`: local Ollama embedding client.
 - `src/mcp/jira_server.py`: stdio MCP tools for live Jira JQL search and
   exact ticket retrieval.
-- `src/memory/postgres.py`: PostgreSQL conversation memory and request
-  idempotency.
-- `src/validations/critic_loop.py`: bounded independent review and refinement.
+- `src/mcp/rovo_mcp_oauth.py`: OAuth 2.1 browser consent and protected token cache
+  for Atlassian's hosted Rovo MCP service.
+- `src/mcp/rovo_mcp_client.py`: read-only Streamable HTTP client for Rovo MCP.
+- `src/memory/postgres.py`: PostgreSQL conversation memory, request
+  idempotency, and reflection audit records.
+- `src/validations/step_6_critic_reflections.py`: hard-capped refinement, score plateau,
+  identical-draft detection, and escalation.
 - `scripts/postgresDb`: PostgreSQL schema migrations applied by bootstrap.
 - `src/utility/seed_jira_tickets.py`: explicit idempotent Jira demo-ticket writer.
 - `src/utility/bootstrap.py`: dependency checks plus PostgreSQL/OpenSearch setup.
@@ -113,7 +121,7 @@ Set the Jira section in `local.json`:
 
 ```json
 {
-  "jira": {
+  "jiraMcp": {
     "enabled": true,
     "base_url": "https://your-company.atlassian.net",
     "email": "your-email@example.com",
@@ -137,7 +145,7 @@ python -m src.utility.seed_jira_tickets --config ci-cd/env/local.json
 
 The command searches for each unique label before creating an issue, so it can
 be rerun safely. It changes Jira Cloud data. After seeding, set
-`jira.read_only` back to `true`; the MCP tools themselves remain read-only in
+`jiraMcp.read_only` back to `true`; the MCP tools themselves remain read-only in
 either case.
 
 Synchronize current Jira tickets into OpenSearch:
@@ -168,7 +176,7 @@ The local fixture files are `golden_tickets.preview.json`,
 ## 5. Run the agent
 
 ```bash
-python -m src.agents.jira_agent \
+python -m src.agents.step_1_cli_entry \
   --config ci-cd/env/local.json \
   --session-id demo-session \
   --request-id request-001 \
@@ -178,6 +186,10 @@ python -m src.agents.jira_agent \
 Use a new request ID for new input. Repeating the exact command returns the
 stored PostgreSQL response without calling Ollama, OpenSearch, or Jira again.
 Messages using the same session ID contribute recent conversation memory.
+
+The Planner and Executor always run. Set `validation.enabled=true` to add the
+Critic/refinement loop; leaving it `false` skips the extra model calls. After
+adding or updating migrations, rerun bootstrap before invoking the agents.
 
 ## Troubleshooting
 
@@ -189,6 +201,6 @@ Messages using the same session ID contribute recent conversation memory.
   OpenSearch index name.
 - Jira `401`: verify the account email and API token; Jira passwords are not
   supported.
-- Jira MCP disabled: set `jira.enabled=true` after replacing all placeholders.
+- Jira MCP disabled: set `jiraMcp.enabled=true` after replacing all placeholders.
 - PostgreSQL connection failure: start the Compose service or change the
   PostgreSQL section to an already-running local database.

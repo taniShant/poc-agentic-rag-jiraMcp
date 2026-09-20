@@ -229,10 +229,11 @@ def main() -> None:
     documents: list[dict[str, Any]] = []
     if arguments.source in {"jira", "all"}:
         jira = JiraClient(
-            config.jira, timeout_seconds=config.agent.request_timeout_seconds
+            config.jira_mcp, timeout_seconds=config.agent.request_timeout_seconds
         )
         tickets = jira.search(
-            config.jira.sync_jql, max_results=config.jira.sync_limit
+            config.jira_mcp.sync_jql,
+            max_results=config.jira_mcp.sync_limit,
         )
         documents.extend(normalize_jira_ticket(ticket) for ticket in tickets)
     if arguments.source in {"sample-jira", "samples"}:

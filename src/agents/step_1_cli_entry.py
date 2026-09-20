@@ -1,4 +1,4 @@
-"""Run the local Strands agent with Ollama, OpenSearch, MCP, and PostgreSQL."""
+"""Run the local Planner–Executor–Critic workflow and its data services."""
 
 from __future__ import annotations
 
@@ -9,27 +9,19 @@ from pathlib import Path
 from typing import Any
 
 from mcp import StdioServerParameters, stdio_client
-from strands import Agent, tool
+from strands import tool
 from strands.models.ollama import OllamaModel
 from strands.tools.mcp import MCPClient
 
+from src.agents.step_2_orchestrator import MultiAgentOrchestrator
+from src.agents.step_3_planner import PlannerAgent
+from src.agents.step_4_executor import ExecutorAgent
+from src.agents.step_5_critic import CriticAgent
 from src.common.config import LocalConfig, load_config
 from src.memory.postgres import LocalStorage
-from src.validations.critic_loop import CriticLoop, Critique, ResponseCritic
+from src.mcp.rovo_mcp_client import create_rovo_mcp_client
 from src.vectorDb.embeddings import OllamaEmbeddings
 from src.vectorDb.retrieval import HybridKnowledgeRetriever
-
-SYSTEM_PROMPT = """
-You are a local Jira investigation agent.
-
-Use search_support_knowledge for historical tickets, Confluence runbooks,
-knowledge-base articles, known issues, and vaguely described problems because
-it combines OpenSearch keyword and vector retrieval.
-Use Jira MCP tools when the user asks for current Jira Cloud facts or an exact
-issue key. Clearly distinguish indexed snapshots from live Jira results. Never
-invent ticket keys, status, descriptions, or URLs. This local agent is read-only;
-do not claim to create, edit, transition, or delete Jira issues.
-""".strip()
 
 _RETRIEVER: HybridKnowledgeRetriever | None = None
 
@@ -53,9 +45,7 @@ def search_support_knowledge(query: str, limit: int = 5) -> list[dict[str, Any]]
     return _RETRIEVER.search(query, limit=limit)
 
 
-def _conversation_prompt(
-    memory: list[dict[str, str]], current_prompt: str
-) -> str:
+def _conversation_prompt(memory: list[dict[str, str]], current_prompt: str) -> str:
     """Combine durable recent memory with the current user prompt.
 
     Args:
@@ -76,60 +66,65 @@ def _conversation_prompt(
     )
 
 
+def _model(config: LocalConfig, max_tokens: int) -> OllamaModel:
+    """Build one role-specific Ollama model adapter with a bounded timeout."""
+    additional_args = {"think": False} if config.agent.disable_thinking else None
+    return OllamaModel(
+        host=config.ollama.base_url,
+        model_id=config.ollama.chat_model,
+        temperature=config.ollama.temperature,
+        max_tokens=max_tokens,
+        ollama_client_args={"timeout": config.agent.request_timeout_seconds},
+        additional_args=additional_args,
+    )
+
+
 def _invoke(
     config: LocalConfig,
     prompt: str,
     mcp_client: MCPClient | None,
+    storage: LocalStorage,
+    session_id: str,
+    request_id: str,
 ) -> str:
-    """Invoke Strands with Ollama and all currently available tools.
+    """Run Planner, tool-enabled Executor, and optional Critic reflection.
 
     Args:
         config: Complete local application configuration.
-        prompt: Prompt including any selected conversation memory.
+        prompt: Prompt including selected conversation memory.
         mcp_client: Connected Jira MCP client, or ``None`` when Jira is disabled.
+        storage: PostgreSQL repository used for reflection audit records.
+        session_id: Durable conversation identifier.
+        request_id: Idempotency identifier correlated with audit records.
 
     Returns:
-        Final agent response text.
+        Final answer text, including an escalation marker when applicable.
     """
-    model = OllamaModel(
-        host=config.ollama.base_url,
-        model_id=config.ollama.chat_model,
-        temperature=config.ollama.temperature, # keep_alive="0", put this for  automatic unloading after each Strands request
-        #Using keep_alive=0 saves memory but makes subsequent requests slower because Ollama must reload the model. A compromise such as "30s" is usually better for interactive testing.
-    )
     tools: list[Any] = [search_support_knowledge]
     if mcp_client is not None:
         tools.extend(mcp_client.list_tools_sync())
-    agent = Agent(
-        model=model,
-        system_prompt=SYSTEM_PROMPT,
-        tools=tools,
-        callback_handler=None,
-    )
-    response = str(agent(prompt))
-    if not config.validation.enabled:
-        return response
 
-    critic = ResponseCritic(
-        config.ollama,
+    planner = PlannerAgent(_model(config, config.agent.planner_max_tokens))
+    executor = ExecutorAgent(
+        _model(config, config.agent.executor_max_tokens),
+        tools,
+    )
+    critic = CriticAgent(
+        _model(config, config.agent.critic_max_tokens),
         config.validation,
-        timeout_seconds=config.agent.request_timeout_seconds,
     )
-    loop = CriticLoop(critic, config.validation.max_refinements)
-
-    def revise(current: str, critique: Critique) -> str:
-        """Ask the tool-enabled executor to address one critic report."""
-        refinement_prompt = (
-            f"{prompt}\n\n"
-            "Revise the candidate response using the independent critic report. "
-            "Re-check facts with tools when necessary. Preserve correct content, "
-            "fix every listed issue, and never invent evidence.\n\n"
-            f"CANDIDATE RESPONSE:\n{current}\n\n"
-            f"CRITIC REPORT:\n{critique.refinement_context()}"
-        )
-        return str(agent(refinement_prompt))
-
-    return loop.run(prompt, response, revise)
+    orchestrator = MultiAgentOrchestrator(
+        planner,
+        executor,
+        critic,
+        config.validation,
+        audit_sink=lambda record: storage.add_reflection_record(
+            request_id,
+            session_id,
+            record,
+        ),
+    )
+    return orchestrator.run(prompt).render()
 
 
 def run_request(
@@ -138,7 +133,7 @@ def run_request(
     request_id: str,
     prompt: str,
 ) -> str:
-    """Run one idempotent local agent request and persist its memory.
+    """Run one idempotent multi-agent request and persist its memory.
 
     Args:
         config: Complete local application configuration.
@@ -157,7 +152,22 @@ def run_request(
     try:
         memory = storage.recent_memory(session_id, config.agent.memory_messages)
         augmented_prompt = _conversation_prompt(memory, prompt)
-        if config.jira.enabled:
+        if config.rovo_mcp.enabled:
+            mcp_client = create_rovo_mcp_client(
+                config.rovo_mcp,
+                startup_timeout_seconds=config.mcp.startup_timeout_seconds,
+                request_timeout_seconds=config.agent.request_timeout_seconds,
+            )
+            with mcp_client:
+                response = _invoke(
+                    config,
+                    augmented_prompt,
+                    mcp_client,
+                    storage,
+                    session_id,
+                    request_id,
+                )
+        elif config.jira_mcp.enabled:
             server = StdioServerParameters(
                 command=sys.executable,
                 args=[
@@ -173,9 +183,23 @@ def run_request(
                 startup_timeout=config.mcp.startup_timeout_seconds,
             )
             with mcp_client:
-                response = _invoke(config, augmented_prompt, mcp_client)
+                response = _invoke(
+                    config,
+                    augmented_prompt,
+                    mcp_client,
+                    storage,
+                    session_id,
+                    request_id,
+                )
         else:
-            response = _invoke(config, augmented_prompt, None)
+            response = _invoke(
+                config,
+                augmented_prompt,
+                None,
+                storage,
+                session_id,
+                request_id,
+            )
 
         storage.add_memory(session_id, "user", prompt)
         storage.add_memory(session_id, "assistant", response)
@@ -187,9 +211,9 @@ def run_request(
 
 
 def main() -> None:
-    """Parse CLI input, initialize local services, and run one agent request."""
+    """Parse CLI input, initialize local services, and run one request."""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("prompt", nargs="?", help="Question for the local agent")
+    parser.add_argument("prompt", nargs="?", help="Question for the local agents")
     parser.add_argument(
         "--config", default="ci-cd/env/local.json", help="Path to local.json"
     )
@@ -215,8 +239,7 @@ def main() -> None:
 
     session_id = arguments.session_id or config.agent.default_session_id
     request_id = arguments.request_id or str(uuid.uuid4())
-    response = run_request(config, session_id, request_id, prompt)
-    print(response)
+    print(run_request(config, session_id, request_id, prompt))
 
 
 if __name__ == "__main__":

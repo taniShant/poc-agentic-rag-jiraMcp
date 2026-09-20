@@ -6,7 +6,7 @@ from typing import Any
 
 import httpx
 
-from src.common.config import JiraConfig
+from src.common.config import JiraMcpConfig
 
 
 def _adf_text(value: Any) -> str:
@@ -32,7 +32,7 @@ def _adf_text(value: Any) -> str:
 class JiraClient:
     """Call Jira Cloud REST API v3 using a local user's API token."""
 
-    def __init__(self, config: JiraConfig, timeout_seconds: int = 30) -> None:
+    def __init__(self, config: JiraMcpConfig, timeout_seconds: int = 30) -> None:
         """Initialize an authenticated Jira client.
 
         Args:
@@ -119,7 +119,9 @@ class JiraClient:
             PermissionError: If Jira is configured as read-only.
         """
         if self._config.read_only:
-            raise PermissionError("Set jira.read_only=false to create dummy tickets")
+            raise PermissionError(
+                "Set jiraMcp.read_only=false to create dummy tickets"
+            )
         response = self._client.post(
             "/rest/api/3/issue",
             json={

@@ -20,13 +20,16 @@ All application settings are read from `ci-cd/env/local.json`. PostgreSQL and Op
 
 ```mermaid
 flowchart TD
-    U[User / CLI] --> R[src.agents.jira_agent runner]
+    U[User / CLI] --> R[step_1_cli_entry runner]
 
     subgraph APP[Local Strands application]
         R --> P[(PostgreSQL)]
-        R --> A[Strands Agent]
-        A --> T1[search_support_knowledge]
-        A --> T2[Jira MCP client]
+        R --> PA[Planner Agent]
+        PA --> EA[Executor Agent]
+        EA --> CA[Critic Agent]
+        CA -->|REFINE with preserve list| EA
+        EA --> T1[search_support_knowledge]
+        EA --> T2[Jira MCP client]
     end
 
     T1 --> H[HybridKnowledgeRetriever]
@@ -36,11 +39,13 @@ flowchart TD
     T2 <-->|stdio| M[Local FastMCP Jira server]
     M --> J[Jira Cloud REST API]
 
-    A --> L[Ollama chat model]
-    A --> C[Critic and bounded refinement]
+    PA --> L[Ollama chat model]
+    EA --> L
+    CA --> L
 
     P --> PM[Conversation memory]
     P --> PI[Idempotency records]
+    P --> PR[Reflection audit records]
 ```
 
 ### Request path
@@ -49,16 +54,23 @@ flowchart TD
 2. PostgreSQL attempts to claim the supplied `request_id`.
 3. If the request was already completed, the stored response is returned.
 4. The new user message and recent session history are added to the prompt.
-5. The Strands agent invokes the configured Ollama chat model.
-6. The agent can search local OpenSearch or call the read-only Jira MCP tools.
-7. User and assistant messages are stored in PostgreSQL.
-8. The idempotency record is marked completed or failed.
+5. The tool-free Planner produces a structured investigation plan.
+6. The Executor can search OpenSearch or call the read-only Jira MCP tools.
+7. When validation is enabled, the tool-free Critic scores the draft and the
+   Executor refines it within the configured hard cap.
+8. Every Critic cycle is written to PostgreSQL; plateau, identical drafts, and
+   exhausted refinements produce an explicit human-review escalation.
+9. User and assistant messages are stored and the idempotency record is closed.
 
 ## Component responsibilities
 
 | Component | Responsibility |
 |---|---|
-| `src/agents/jira_agent.py` | Builds and runs the Strands agent, tool set, memory flow, and idempotency flow. |
+| `src/agents/step_1_cli_entry.py` | Owns the CLI, model construction, MCP lifecycle, memory, and idempotency flow. |
+| `src/agents/step_2_orchestrator.py` | Coordinates the three roles and optional reflection. |
+| `src/agents/step_3_planner.py` | Creates a structured, evidence-first plan without tools. |
+| `src/agents/step_4_executor.py` | Uses only the supplied OpenSearch and MCP tools to produce or revise a draft. |
+| `src/agents/step_5_critic.py` | Independently scores accuracy, groundedness, completeness, and relevance. |
 | Ollama chat model | Performs local reasoning and response generation using the configured chat model. |
 | Ollama embedding model | Produces vectors for Jira, Confluence, known issues, and user queries. |
 | `src/vectorDb/ingestion.py` | Normalizes Jira, Confluence, and known-issue records, generates embeddings, and upserts OpenSearch documents. |
@@ -67,15 +79,21 @@ flowchart TD
 | `src/vectorDb/embeddings.py` | Produces and validates local Ollama embeddings. |
 | `src/mcp/jira_server.py` | Exposes the approved Jira read operations as local FastMCP tools. |
 | `src/mcp/jira_client.py` | Implements Jira Cloud REST access and issue normalization. |
-| `src/memory/postgres.py` | Stores conversation memory and idempotency records in PostgreSQL. |
-| `src/validations/critic_loop.py` | Reviews answers and performs bounded tool-enabled refinement. |
+| `src/memory/postgres.py` | Stores conversation memory, idempotency, and reflection audit records. |
+| `src/validations/step_6_critic_reflections.py` | Enforces hard caps, plateau and identical-draft checks, preservation, and escalation. |
 | `src/utility/seed_jira_tickets.py` | Creates the small development fixture set when explicitly run by an operator. |
 | `src/utility/bootstrap.py` | Applies PostgreSQL migrations and verifies Ollama and OpenSearch readiness. |
 | `scripts/postgresDb/001_memory_and_idempotency.sql` | Defines the local memory and idempotency tables. |
+| `scripts/postgresDb/002_agent_reflection_audit.sql` | Defines the per-cycle Critic audit table. |
 
 ## MCP boundary
 
-The Jira MCP server is a local subprocess using the `stdio` transport. It is started only when `jira.enabled` is `true`.
+The Jira MCP server is a local subprocess using the `stdio` transport. It is started only when `jiraMcp.enabled` is `true`.
+
+As an alternative, `rovoMcp.enabled=true` connects the Executor to Atlassian's
+hosted Rovo MCP endpoint over Streamable HTTP and OAuth 2.1. The two integrations
+are mutually exclusive. The Rovo client exposes only its configured read-only
+tool allowlist and excludes generic write and destructive execution pathways.
 
 The MCP server exposes these read operations:
 
@@ -90,7 +108,7 @@ Creating demo tickets is a separate, explicit operator action. For example:
 python -m src.utility.seed_jira_tickets --config ci-cd/env/local.json
 ```
 
-Ticket seeding requires `jira.read_only=false` and should be changed back to `true` after the one-time operation.
+Ticket seeding requires `jiraMcp.read_only=false` and should be changed back to `true` after the one-time operation.
 
 ## Jira snapshot ingestion and retrieval
 
@@ -149,6 +167,7 @@ The local schema contains:
 
 - `agent_memory`: recent user and assistant messages by session.
 - `idempotency_record`: request ownership, execution status, stored response, and error details.
+- `agent_reflection_audit`: iteration, draft hash, scores, verdict, and issues.
 
 This supports short conversational continuity and prevents accidental duplicate processing. It is not intended to be a complete long-term knowledge or analytics database.
 

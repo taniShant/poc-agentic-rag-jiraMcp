@@ -1,146 +1,285 @@
-# Local Strands + Ollama + OpenSearch + Jira MCP
+# Local Strands Multi-Agent Jira Assistant
 
-This path runs independently of AWS. Every application setting is loaded from
-`ci-cd/env/local.json`.
+This project runs locally without AWS. It uses three Strands agents with
+Ollama, OpenSearch, PostgreSQL, and an optional Jira Cloud MCP connection.
 
 ```text
-                         Strands
-                    /       |       \
-                Ollama  OpenSearch   MCP (stdio)
-                  LLM    BM25+k-NN      |
-                                         Jira Cloud
-                    
-                         PostgreSQL
-                         /         \
-                     memory    idempotency
+User
+  |
+  v
+Planner  --->  Executor  --->  Critic
+                 ^              |
+                 |---- REFINE ---|
+                 |
+          OpenSearch + Jira MCP
+
+PostgreSQL: conversation memory + idempotency + reflection audit
 ```
 
-The local Jira MCP server is read-only. Creating the demonstration issues is a
-separate, explicit command so an agent prompt cannot accidentally write to Jira.
+- The **Planner** creates an evidence-gathering plan and has no tools.
+- The **Executor** can search OpenSearch and, when enabled, call the read-only
+  Jira MCP tools.
+- The **Critic** independently scores the answer and requests bounded revisions.
+- PostgreSQL stores runtime state. Jira, Confluence, and known-issue documents
+  and their vectors are stored in OpenSearch.
 
-## Components
+## Prerequisites
 
-- `src/agents/jira_agent.py`: Strands agent backed by the local Ollama model.
-- `src/vectorDb/ingestion.py`: Jira normalization, embedding, and OpenSearch
-  document upserts.
-- `src/vectorDb/retrieval.py`: weighted BM25/k-NN reciprocal-rank fusion.
-- `src/vectorDb/opensearch_store.py`: index mapping and OpenSearch persistence.
-- `src/vectorDb/embeddings.py`: local Ollama embedding client.
-- `src/mcp/jira_server.py`: stdio MCP tools for live Jira JQL search and
-  exact ticket retrieval.
-- `src/memory/postgres.py`: PostgreSQL conversation memory and request
-  idempotency.
-- `src/validations/critic_loop.py`: bounded independent review and refinement.
-- `scripts/postgresDb`: PostgreSQL schema migrations applied by bootstrap.
-- `src/utility/seed_jira_tickets.py`: explicit idempotent Jira demo-ticket writer.
-- `src/utility/bootstrap.py`: dependency checks plus PostgreSQL/OpenSearch setup.
+Install these tools before starting:
 
-## 1. Configure local.json
+- Python 3.11 or 3.12
+- Docker Desktop with Docker Compose
+- Ollama
+- At least 6 GB of available memory for Docker and Ollama together
 
-`ci-cd/env/local.json` has been created from
-`ci-cd/env/local.example.json` and is ignored by Git.
-Update it for your local services. In particular, verify the installed Ollama
-model names and embedding dimensions.
+Check the installations:
 
-The supplied OpenSearch settings already target the existing container:
+```bash
+python --version
+docker --version
+docker compose version
+ollama --version
+```
+
+All commands below are run from the project root:
+
+```bash
+cd /Users/shantanu/Downloads/CodeProjects/AGENTIC_AI_PROJECTS/POC-AGENTIC-MPC-JIRA/poc-agentic-mcp-local
+```
+
+## 1. Create the Python environment
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+Activate `.venv` again whenever a new terminal is opened:
+
+```bash
+source .venv/bin/activate
+```
+
+## 2. Create and configure `local.json`
+
+Create the local configuration if it does not already exist:
+
+```bash
+cp ci-cd/env/local.example.json ci-cd/env/local.json
+```
+
+`ci-cd/env/local.json` is ignored by Git. Keep passwords and Jira API tokens
+only in this file and never commit it.
+
+For the supplied Docker Compose services, the important values are:
 
 ```json
 {
+  "ollama": {
+    "base_url": "http://localhost:11434",
+    "chat_model": "qwen3:8b",
+    "embedding_model": "nomic-embed-text",
+    "embedding_dimensions": 768
+  },
   "opensearch": {
     "url": "http://localhost:9200",
-    "index_name": "local-support-knowledge"
+    "index_name": "local-support-knowledge",
+    "username": "",
+    "password": "",
+    "verify_tls": false
+  },
+  "postgres": {
+    "host": "localhost",
+    "port": 5432,
+    "database": "agentic_local",
+    "username": "agentic_local",
+    "password": "change-me",
+    "ssl": false
+  },
+  "jiraMcp": {
+    "enabled": false,
+    "read_only": true
+  },
+  "validation": {
+    "enabled": false,
+    "max_refinements": 2,
+    "pass_score": 4.0,
+    "min_individual_score": 3,
+    "plateau_patience": 3,
+    "improvement_epsilon": 0.01
   }
 }
 ```
 
-The running `opensearchproject/opensearch:latest` container was detected as
-OpenSearch `3.8.0`, with the `opensearch-knn` plugin installed. The implementation
-does not require an OpenSearch-hosted model or search pipeline; Ollama creates
-raw vectors and the application combines BM25 and k-NN rankings.
+Leave Jira disabled for the first local run. Setting `validation.enabled` to
+`false` runs Planner and Executor but skips the additional Critic calls. Set it
+to `true` when the full three-agent reflection workflow is required.
 
-`local.json` intentionally contains the local PostgreSQL password and, once
-configured, a Jira API token. Do not commit it or reuse these credentials in a
-shared environment.
+## 3. Start PostgreSQL and OpenSearch
 
-## 2. Start PostgreSQL, OpenSearch, and Ollama
-
-The included Compose file starts PostgreSQL and a single-node OpenSearch 3.8.0
-development cluster together:
+The Compose file starts both services and persists their data in named Docker
+volumes:
 
 ```bash
 docker compose -f docker-compose.local.yml up -d
 docker compose -f docker-compose.local.yml ps
 ```
 
-If the separately created container named `opensearch` still exists, stop and
-remove that container before starting this Compose project; otherwise port 9200
-will already be occupied. The Compose-managed OpenSearch data is stored in the
-`customer-agent-opensearch-data` volume. It does not automatically adopt data
-from the old standalone container.
+Wait until both services report `healthy`. Useful checks are:
 
-The local development cluster disables OpenSearch's security plugin because it
-is bound only to localhost and `local.json` currently uses plain HTTP without
-credentials. Do not expose this configuration outside the development machine.
+```bash
+docker exec customer-agent-postgres pg_isready -U agentic_local -d agentic_local
+curl http://localhost:9200/_cluster/health
+```
 
-Install/start Ollama and pull the two models named in `local.json`:
+If port `9200` is already occupied by an older standalone OpenSearch container,
+stop or remove that specific container before starting this Compose project.
+
+OpenSearch security is disabled for this localhost-only development setup. Do
+not expose ports `9200`, `9600`, or `5432` to an external network.
+
+## 4. Start Ollama and download the models
+
+In a separate terminal, start Ollama if it is not already running:
 
 ```bash
 ollama serve
-ollama pull qwen3:8b
-ollama pull nomic-embed-text
 ```
 
-If a selected embedding model emits a different dimension, update
-`ollama.embedding_dimensions` before bootstrapping. Changing the dimension after
-the index exists requires using a new index name or deliberately recreating it.
-
-## 3. Install and bootstrap
+In another terminal, download the models configured in `local.json`:
 
 ```bash
-python -m venv .venv
+ollama pull qwen3:8b
+ollama pull nomic-embed-text
+ollama list
+```
+
+The configured embedding dimension must match the output of the embedding
+model. This project expects `nomic-embed-text` to produce 768 dimensions.
+
+## 5. Apply PostgreSQL migrations and bootstrap services
+
+PostgreSQL, OpenSearch, and Ollama must all be running before bootstrap:
+
+```bash
 source .venv/bin/activate
-pip install -r requirements.txt
 python -m src.utility.bootstrap --config ci-cd/env/local.json
 ```
 
-Bootstrap applies the memory/idempotency migration, verifies the Ollama models
-and vector dimension, checks OpenSearch, and creates `local-support-knowledge` if it
-does not exist. PostgreSQL migrations are loaded from `scripts/postgresDb`.
+Bootstrap reads every `*.sql` file in `scripts/postgresDb` in lexical order and
+applies it idempotently:
 
-## 4. Connect Jira Cloud and create demo tickets
+1. `001_memory_and_idempotency.sql`
+   - creates `agent_memory`
+   - creates `idempotency_record`
+2. `002_agent_reflection_audit.sql`
+   - creates `agent_reflection_audit`
 
-Set the Jira section in `local.json`:
+Bootstrap also verifies the Ollama models and embedding dimension, checks the
+OpenSearch cluster, and creates the configured OpenSearch index when missing.
+Rerun the same bootstrap command whenever a new migration is added.
+
+Verify the PostgreSQL tables without installing `psql` on the Mac:
+
+```bash
+docker exec customer-agent-postgres \
+  psql -U agentic_local -d agentic_local -c '\dt'
+
+docker exec customer-agent-postgres \
+  psql -U agentic_local -d agentic_local \
+  -c 'SELECT COUNT(*) FROM agent_memory;'
+
+docker exec customer-agent-postgres \
+  psql -U agentic_local -d agentic_local \
+  -c 'SELECT COUNT(*) FROM agent_reflection_audit;'
+```
+
+## 6. Populate OpenSearch
+
+Load the bundled sample data: 100 historical Jira tickets, dummy Confluence
+runbooks/KB content, and known issues.
+
+```bash
+python -m src.vectorDb.ingestion \
+  --config ci-cd/env/local.json \
+  --source samples \
+  --confluence-file scripts/opensearchDb/dummy_confluence_runbooks.json \
+  --skip-existing
+```
+
+The source files are:
+
+- `scripts/jira/golden_tickets.preview.json`
+- `scripts/opensearchDb/dummy_confluence_runbooks.json`
+- `scripts/jira/dummy_known_issues.json`
+
+The ingestion process normalizes each record, generates its Ollama embedding,
+and upserts it into `local-support-knowledge`. Stable document IDs prevent
+duplicates. Omit `--skip-existing` when existing documents should be refreshed.
+
+Available source selectors are:
+
+```text
+jira | sample-jira | confluence | known-issues | samples | all
+```
+
+Check the indexed document count:
+
+```bash
+curl http://localhost:9200/local-support-knowledge/_count
+```
+
+## 7. Run the multi-agent workflow
+
+```bash
+python -m src.agents.step_1_cli_entry \
+  --config ci-cd/env/local.json \
+  --session-id demo-session \
+  --request-id request-001 \
+  "Find resolved tickets and runbooks related to password reset failures"
+```
+
+Use a new `request-id` for each new request. Reusing the same ID with the same
+input returns the stored PostgreSQL response without rerunning Ollama or search.
+Reusing an ID with different input is rejected.
+
+When Critic validation is enabled, inspect its audit trail with:
+
+```bash
+docker exec customer-agent-postgres \
+  psql -U agentic_local -d agentic_local \
+  -c 'SELECT request_id, iteration, composite_score, verdict, issues FROM agent_reflection_audit ORDER BY created_at DESC LIMIT 20;'
+```
+
+## 8. Optional Jira Cloud MCP setup
+
+Jira is not required for the local sample-data workflow. To query live Jira,
+update the `jira` object in `local.json`:
 
 ```json
 {
-  "jira": {
+  "jiraMcp": {
     "enabled": true,
     "base_url": "https://your-company.atlassian.net",
     "email": "your-email@example.com",
     "api_token": "your-api-token",
-    "project_key": "DEMO",
-    "read_only": false,
-    "sync_jql": "project = DEMO ORDER BY updated DESC",
+    "project_key": "SCRUM",
+    "read_only": true,
+    "sync_jql": "project = SCRUM ORDER BY updated DESC",
     "sync_limit": 100
   }
 }
 ```
 
-For this local/ad-hoc integration, Jira authenticates with email plus an API
-token. OAuth 2.0 should replace it for a distributed application.
+Use an Atlassian API token, not the account password. The MCP server exposes
+only these read operations to the Executor:
 
-Create the five labeled demonstration issues explicitly:
+- `search_jira_tickets`
+- `get_jira_ticket`
 
-```bash
-python -m src.utility.seed_jira_tickets --config ci-cd/env/local.json
-```
-
-The command searches for each unique label before creating an issue, so it can
-be rerun safely. It changes Jira Cloud data. After seeding, set
-`jira.read_only` back to `true`; the MCP tools themselves remain read-only in
-either case.
-
-Synchronize current Jira tickets into OpenSearch:
+To index current Jira results into OpenSearch:
 
 ```bash
 python -m src.vectorDb.ingestion \
@@ -148,54 +287,169 @@ python -m src.vectorDb.ingestion \
   --source jira
 ```
 
-Run synchronization again whenever the indexed snapshot should be refreshed.
-Live exact-ticket questions can use MCP without waiting for a sync.
+Creating dummy Jira tickets is a separate operator action and is not part of
+the agent workflow. Tickets created in Jira Cloud remain there after local
+Docker teardown.
 
-Populate the vector database without Jira Cloud by loading the local golden
-Jira records, dummy Confluence pages, and known issues:
+### Alternative: hosted Atlassian Rovo MCP with OAuth 2.1
+
+The Rovo MCP files integrate with Atlassian's hosted service. This is
+an alternative to the local `jira_server.py`; enable only one integration.
+
+- `src/mcp/rovo_mcp_oauth.py`: OAuth 2.1 browser callback and secure token storage.
+- `src/mcp/rovo_mcp_client.py`: Streamable HTTP transport and Strands MCP client.
+
+The implementation follows Atlassian's official endpoint and OAuth guidance:
+
+- <https://developer.atlassian.com/cloud/rovo-mcp/guides/getting-started/>
+- <https://developer.atlassian.com/cloud/rovo-mcp/guides/configuring-oauth-2-1/>
+- <https://developer.atlassian.com/cloud/rovo-mcp/guides/supported-tools/>
+
+Configure `local.json` as follows and keep `jiraMcp.enabled=false`:
+
+```json
+{
+  "jiraMcp": {
+    "enabled": false
+  },
+  "rovoMcp": {
+    "enabled": true,
+    "server_url": "https://mcp.atlassian.com/v2/mcp",
+    "redirect_uri": "http://127.0.0.1:8765/oauth/callback",
+    "token_store": ".local/rovo_oauth_tokens.json",
+    "oauth_timeout_seconds": 300,
+    "scopes": "read:jira:agent-interface search:jira:agent-interface",
+    "allowed_tools": [
+      "atlassianUserInfo",
+      "getAccessibleAtlassianResources",
+      "getJiraIssue",
+      "searchJiraIssuesUsingJql",
+      "discover",
+      "executeRead"
+    ]
+  }
+}
+```
+
+On the first agent run, the MCP SDK discovers Atlassian's authorization server,
+registers the client dynamically, creates PKCE state, and opens browser consent.
+After approval, Atlassian redirects to the loopback callback. Tokens and dynamic
+client registration are saved under `.local/` with owner-only file permissions.
+Later runs reuse or refresh the stored token.
+
+The allowlist intentionally excludes `executeWrite` and `executeDestructive`.
+The remote tools are exposed to the Executor with a `rovo_` prefix. Your
+Atlassian administrator may also need to allow the callback/domain in the Rovo
+MCP administration settings. Delete `.local/rovo_oauth_tokens.json` to force a
+new authorization flow.
+
+## 9. Run tests
+
+The unit tests do not require live PostgreSQL, OpenSearch, Ollama, or Jira:
 
 ```bash
+python -m unittest discover -s tests -v
+```
+
+## Routine start and stop
+
+Start the persisted PostgreSQL and OpenSearch services:
+
+```bash
+docker compose -f docker-compose.local.yml up -d
+```
+
+Stop the containers while preserving all PostgreSQL and OpenSearch data:
+
+```bash
+docker compose -f docker-compose.local.yml stop
+```
+
+Resume them later with:
+
+```bash
+docker compose -f docker-compose.local.yml start
+```
+
+If `ollama serve` is running in a foreground terminal, press `Ctrl+C` in that
+terminal to stop it. If Ollama was installed as a Homebrew service, use:
+
+```bash
+brew services stop ollama
+```
+
+Stopping Ollama does not delete downloaded models.
+
+## Teardown
+
+### Remove containers but preserve data
+
+This removes the Compose containers and network. Named volumes—and therefore
+the PostgreSQL tables and OpenSearch index—are preserved:
+
+```bash
+docker compose -f docker-compose.local.yml down
+```
+
+Restart later with `up -d`; migrations and indexed records will still exist.
+
+### Full local reset, including all database and vector data
+
+The following command permanently deletes the Compose project's PostgreSQL and
+OpenSearch volumes. It does not delete Jira Cloud tickets or Ollama models.
+
+```bash
+docker compose -f docker-compose.local.yml down -v
+```
+
+After a full reset, rebuild the local state in this order:
+
+```bash
+docker compose -f docker-compose.local.yml up -d
+python -m src.utility.bootstrap --config ci-cd/env/local.json
 python -m src.vectorDb.ingestion \
   --config ci-cd/env/local.json \
   --source samples \
+  --confluence-file scripts/opensearchDb/dummy_confluence_runbooks.json \
   --skip-existing
 ```
 
-The sample source loads:
-
-- `scripts/jira/golden_tickets.preview.json`
-- `scripts/jira/dummy_confluence_runbooks.json`
-- `scripts/jira/dummy_known_issues.json`
-
-Use `--source confluence`, `--source known-issues`, or
-`--source sample-jira` to refresh only one local source. Document IDs are
-namespaced and upserted, so rerunning ingestion updates records without
-creating duplicates.
-
-## 5. Run the agent
+To deliberately remove downloaded Ollama models as well:
 
 ```bash
-python -m src.agents.jira_agent \
-  --config ci-cd/env/local.json \
-  --session-id demo-session \
-  --request-id request-001 \
-  "Find tickets related to damaged laptop deliveries"
+ollama rm qwen3:8b
+ollama rm nomic-embed-text
 ```
-
-Use a new request ID for new input. Repeating the exact command returns the
-stored PostgreSQL response without calling Ollama, OpenSearch, or Jira again.
-Messages using the same session ID contribute recent conversation memory.
 
 ## Troubleshooting
 
-- `Connection refused` on port `9200`: run
-  `docker compose -f docker-compose.local.yml ps` and confirm the OpenSearch
-  health check has passed.
-- Ollama `404`: pull the exact chat and embedding model names in `local.json`.
-- Vector dimension mismatch: correct `embedding_dimensions` and select a new
-  OpenSearch index name.
-- Jira `401`: verify the account email and API token; Jira passwords are not
-  supported.
-- Jira MCP disabled: set `jira.enabled=true` after replacing all placeholders.
-- PostgreSQL connection failure: start the Compose service or change the
-  PostgreSQL section to an already-running local database.
+- **`ModuleNotFoundError`**: activate `.venv` and rerun
+  `python -m pip install -r requirements.txt`.
+- **PostgreSQL connection timeout/refused**: check
+  `docker compose -f docker-compose.local.yml ps` and container logs.
+- **OpenSearch connection refused**: wait for the health check, then run
+  `curl http://localhost:9200/_cluster/health`.
+- **OpenSearch port already allocated**: find the old container with
+  `docker ps` and stop that exact container.
+- **Ollama `404`**: ensure the exact models from `local.json` appear in
+  `ollama list`.
+- **Embedding dimension mismatch**: correct `embedding_dimensions`; if the old
+  index uses another dimension, select a new index name or perform a full reset.
+- **Jira `401`**: use the Atlassian account email and an API token, not the
+  account password.
+- **Slow Critic calls**: set `validation.enabled=false` for Planner + Executor
+  operation, or use a smaller Ollama chat model.
+
+## Main source locations
+
+- `src/agents/step_1_cli_entry.py`: CLI and service initialization
+- `src/agents/step_2_orchestrator.py`: workflow coordination
+- `src/agents/step_3_planner.py`: tool-free Planner
+- `src/agents/step_4_executor.py`: tool-enabled Executor
+- `src/agents/step_5_critic.py`: independent Critic agent
+- `src/validations/step_6_critic_reflections.py`: bounded Critic/Executor reflection controls
+- `src/vectorDb/ingestion.py`: OpenSearch input pipeline
+- `src/vectorDb/retrieval.py`: hybrid retrieval
+- `src/mcp/jira_server.py`: read-only Jira MCP server
+- `src/memory/postgres.py`: memory, idempotency, and reflection persistence
+- `scripts/postgresDb`: ordered PostgreSQL migrations

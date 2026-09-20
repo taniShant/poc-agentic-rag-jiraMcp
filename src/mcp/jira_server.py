@@ -67,7 +67,7 @@ def main() -> None:
 
     global _JIRA_CLIENT
     _JIRA_CLIENT = JiraClient(
-        config.jira, timeout_seconds=config.agent.request_timeout_seconds
+        config.jira_mcp, timeout_seconds=config.agent.request_timeout_seconds
     )
     MCP.run(transport="stdio")
 

@@ -23,7 +23,7 @@
     "password": "change-me",
     "ssl": false
   },
-  "jira": {
+  "jiraMcp": {
     "enabled": false,
     "base_url": "https://your-company.atlassian.net",
     "email": "your-email@example.com",
@@ -33,6 +33,22 @@
     "sync_jql": "project = DEMO ORDER BY updated DESC",
     "sync_limit": 100
   },
+  "rovoMcp": {
+    "enabled": false,
+    "server_url": "https://mcp.atlassian.com/v2/mcp",
+    "redirect_uri": "http://127.0.0.1:8765/oauth/callback",
+    "token_store": ".local/rovo_oauth_tokens.json",
+    "oauth_timeout_seconds": 300,
+    "scopes": "read:jira:agent-interface search:jira:agent-interface",
+    "allowed_tools": [
+      "atlassianUserInfo",
+      "getAccessibleAtlassianResources",
+      "getJiraIssue",
+      "searchJiraIssuesUsingJql",
+      "discover",
+      "executeRead"
+    ]
+  },
   "mcp": {
     "transport": "stdio",
     "startup_timeout_seconds": 30
@@ -41,11 +57,17 @@
     "enabled": true,
     "max_refinements": 2,
     "pass_score": 4.0,
-    "min_individual_score": 3
+    "min_individual_score": 3,
+    "plateau_patience": 3,
+    "improvement_epsilon": 0.01
   },
   "agent": {
     "memory_messages": 12,
     "default_session_id": "local-demo",
-    "request_timeout_seconds": 120
+    "request_timeout_seconds": 120,
+    "planner_max_tokens": 384,
+    "executor_max_tokens": 1024,
+    "critic_max_tokens": 512,
+    "disable_thinking": true
   }
 }

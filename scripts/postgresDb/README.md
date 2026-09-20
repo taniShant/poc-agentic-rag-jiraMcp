@@ -4,11 +4,13 @@ This directory is the single source of truth for the local PostgreSQL schema.
 Migration files are ordered lexically and must remain idempotent because
 bootstrap may apply them more than once.
 
-Current migration:
+Current migrations:
 
 - `001_memory_and_idempotency.sql` creates `agent_memory` for recent
   conversation history and `idempotency_record` for exactly-once request
   processing.
+- `002_agent_reflection_audit.sql` records every Critic cycle, including the
+  draft hash, quality scores, verdict, and issues.
 
 Apply the migrations together with the other local bootstrap checks:
 
@@ -29,12 +31,16 @@ Then run:
 \dt
 \d agent_memory
 \d idempotency_record
+\d agent_reflection_audit
 ```
 
  
 
 SELECT * FROM agent_memory ORDER BY created_at DESC LIMIT 10;
 SELECT * FROM idempotency_record ORDER BY created_at DESC LIMIT 10;
+SELECT * FROM agent_reflection_audit ORDER BY created_at DESC LIMIT 10;
 
 
-PostgreSQL does not store Jira tickets. Jira ticket snapshots and vectors belong in OpenSearch; PostgreSQL stores conversation memory and request-processing state.
+PostgreSQL does not store Jira tickets. Jira ticket snapshots and vectors belong
+in OpenSearch; PostgreSQL stores conversation memory, request-processing state,
+and the reflection audit trail.

@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import hashlib
+import json
 from pathlib import Path
 from typing import Any
 
 import pg8000.dbapi
 
 from src.common.config import PostgresConfig
+from src.agents.contracts import LoopRecord
 
 
 def _split_sql_statements(sql_text: str) -> list[str]:
@@ -46,7 +48,7 @@ def _split_sql_statements(sql_text: str) -> list[str]:
 
 
 class LocalStorage:
-    """Persist agent memory and exactly-once request results in PostgreSQL."""
+    """Persist memory, idempotency results, and reflection audit records."""
 
     def __init__(self, config: PostgresConfig) -> None:
         """Initialize the PostgreSQL repository.
@@ -241,6 +243,39 @@ class LocalStorage:
             return [{"role": row[0], "content": row[1]} for row in cursor.fetchall()]
         finally:
             connection.close()
+
+    def add_reflection_record(
+        self,
+        request_id: str,
+        session_id: str,
+        record: LoopRecord,
+    ) -> None:
+        """Persist one Critic cycle for traceability and later analysis.
+
+        Args:
+            request_id: Idempotent request correlated with this cycle.
+            session_id: Conversation identifier.
+            record: Immutable in-process reflection record.
+        """
+        self._execute(
+            """
+            INSERT INTO agent_reflection_audit (
+                request_id, session_id, iteration, draft_hash,
+                composite_score, criterion_scores, verdict, issues, created_at
+            ) VALUES (%s, %s, %s, %s, %s, %s::jsonb, %s, %s::jsonb, %s)
+            """,
+            (
+                request_id,
+                session_id,
+                record.iteration,
+                record.draft_hash,
+                record.composite_score,
+                json.dumps(record.criterion_scores),
+                record.verdict.value,
+                json.dumps(record.issues),
+                record.created_at,
+            ),
+        )
 
     def _execute(self, sql: str, parameters: tuple[Any, ...]) -> None:
         """Execute and commit one parameterized mutation.

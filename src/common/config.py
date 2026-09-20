@@ -45,7 +45,7 @@ class PostgresConfig:
 
 
 @dataclass(frozen=True)
-class JiraConfig:
+class JiraMcpConfig:
     """Jira Cloud REST settings exposed through the local MCP server."""
 
     enabled: bool
@@ -59,12 +59,32 @@ class JiraConfig:
 
 
 @dataclass(frozen=True)
+class RovoMcpConfig:
+    """Atlassian Rovo MCP OAuth 2.1 client settings.
+
+    These settings connect the local Executor to Atlassian's hosted Rovo MCP.
+    """
+
+    enabled: bool
+    server_url: str
+    redirect_uri: str
+    token_store: Path
+    scopes: str
+    allowed_tools: tuple[str, ...]
+    oauth_timeout_seconds: int
+
+
+@dataclass(frozen=True)
 class AgentConfig:
-    """Local agent session and timeout settings."""
+    """Local multi-agent session, timeout, and generation settings."""
 
     memory_messages: int
     default_session_id: str
     request_timeout_seconds: int
+    planner_max_tokens: int = 384
+    executor_max_tokens: int = 1024
+    critic_max_tokens: int = 512
+    disable_thinking: bool = True
 
 
 @dataclass(frozen=True)
@@ -75,6 +95,8 @@ class ValidationConfig:
     max_refinements: int
     pass_score: float
     min_individual_score: int
+    plateau_patience: int = 3
+    improvement_epsilon: float = 0.01
 
 
 @dataclass(frozen=True)
@@ -92,7 +114,8 @@ class LocalConfig:
     ollama: OllamaConfig
     opensearch: OpenSearchConfig
     postgres: PostgresConfig
-    jira: JiraConfig
+    jira_mcp: JiraMcpConfig
+    rovo_mcp: RovoMcpConfig
     mcp: McpConfig
     agent: AgentConfig
     validation: ValidationConfig
@@ -139,19 +162,70 @@ def load_config(path: str | Path = "ci-cd/env/local.json") -> LocalConfig:
     ollama = OllamaConfig(**_required_section(document, "ollama"))
     opensearch = OpenSearchConfig(**_required_section(document, "opensearch"))
     postgres = PostgresConfig(**_required_section(document, "postgres"))
-    jira = JiraConfig(**_required_section(document, "jira"))
+    jira_mcp = JiraMcpConfig(**_required_section(document, "jiraMcp"))
+    rovo_values = document.get("rovoMcp", {})
+    if not isinstance(rovo_values, dict):
+        raise ValueError("local.json section 'rovoMcp' must be an object")
+    token_store_value = str(
+        rovo_values.get("token_store", ".local/rovo_oauth_tokens.json")
+    )
+    token_store = Path(token_store_value).expanduser()
+    if not token_store.is_absolute():
+        token_store = source_path.parents[2] / token_store
+    rovo_mcp = RovoMcpConfig(
+        enabled=bool(rovo_values.get("enabled", False)),
+        server_url=str(
+            rovo_values.get("server_url", "https://mcp.atlassian.com/v2/mcp")
+        ),
+        redirect_uri=str(
+            rovo_values.get(
+                "redirect_uri", "http://127.0.0.1:8765/oauth/callback"
+            )
+        ),
+        token_store=token_store.resolve(),
+        scopes=str(
+            rovo_values.get(
+                "scopes",
+                "read:jira:agent-interface search:jira:agent-interface",
+            )
+        ),
+        allowed_tools=tuple(
+            str(item)
+            for item in rovo_values.get(
+                "allowed_tools",
+                [
+                    "atlassianUserInfo",
+                    "getAccessibleAtlassianResources",
+                    "getJiraIssue",
+                    "searchJiraIssuesUsingJql",
+                    "discover",
+                    "executeRead",
+                ],
+            )
+        ),
+        oauth_timeout_seconds=int(rovo_values.get("oauth_timeout_seconds", 300)),
+    )
     mcp = McpConfig(**_required_section(document, "mcp"))
-    agent = AgentConfig(**_required_section(document, "agent"))
+    agent_values = _required_section(document, "agent")
+    agent = AgentConfig(
+        memory_messages=int(agent_values["memory_messages"]),
+        default_session_id=str(agent_values["default_session_id"]),
+        request_timeout_seconds=int(agent_values["request_timeout_seconds"]),
+        planner_max_tokens=int(agent_values.get("planner_max_tokens", 384)),
+        executor_max_tokens=int(agent_values.get("executor_max_tokens", 1024)),
+        critic_max_tokens=int(agent_values.get("critic_max_tokens", 512)),
+        disable_thinking=bool(agent_values.get("disable_thinking", True)),
+    )
+    validation_values = document.get("validation", {})
+    if not isinstance(validation_values, dict):
+        raise ValueError("local.json section 'validation' must be an object")
     validation = ValidationConfig(
-        **document.get(
-            "validation",
-            {
-                "enabled": False,
-                "max_refinements": 2,
-                "pass_score": 4.0,
-                "min_individual_score": 3,
-            },
-        )
+        enabled=bool(validation_values.get("enabled", False)),
+        max_refinements=int(validation_values.get("max_refinements", 2)),
+        pass_score=float(validation_values.get("pass_score", 4.0)),
+        min_individual_score=int(validation_values.get("min_individual_score", 3)),
+        plateau_patience=int(validation_values.get("plateau_patience", 3)),
+        improvement_epsilon=float(validation_values.get("improvement_epsilon", 0.01)),
     )
 
     if ollama.embedding_dimensions < 1:
@@ -170,20 +244,49 @@ def load_config(path: str | Path = "ci-cd/env/local.json") -> LocalConfig:
         raise ValueError("validation.pass_score must be between 1 and 5")
     if not 1 <= validation.min_individual_score <= 5:
         raise ValueError("validation.min_individual_score must be between 1 and 5")
-    if jira.enabled and not all(
+    if validation.plateau_patience < 1:
+        raise ValueError("validation.plateau_patience must be positive")
+    if validation.improvement_epsilon < 0:
+        raise ValueError("validation.improvement_epsilon must not be negative")
+    if min(agent.planner_max_tokens, agent.executor_max_tokens, agent.critic_max_tokens) < 1:
+        raise ValueError("agent role token limits must be positive")
+    if jira_mcp.enabled and not all(
         value
         and not value.startswith("replace-")
         and "your-company" not in value
         and "your-email" not in value
-        for value in (jira.base_url, jira.email, jira.api_token, jira.project_key)
+        for value in (
+            jira_mcp.base_url,
+            jira_mcp.email,
+            jira_mcp.api_token,
+            jira_mcp.project_key,
+        )
     ):
-        raise ValueError("Jira is enabled but its local.json credentials are placeholders")
+        raise ValueError(
+            "jiraMcp is enabled but its local.json credentials are placeholders"
+        )
+    if jira_mcp.enabled and rovo_mcp.enabled:
+        raise ValueError("enable either jiraMcp or rovoMcp integration, not both")
+    if rovo_mcp.enabled and not rovo_mcp.server_url.startswith("https://"):
+        raise ValueError("rovoMcp.server_url must use HTTPS")
+    if rovo_mcp.enabled and not rovo_mcp.redirect_uri.startswith(
+        ("http://127.0.0.1:", "http://localhost:")
+    ):
+        raise ValueError("rovoMcp.redirect_uri must use a loopback HTTP address")
+    forbidden_rovo_tools = {"executeWrite", "executeDestructive"}
+    if forbidden_rovo_tools.intersection(rovo_mcp.allowed_tools):
+        raise ValueError(
+            "rovoMcp.allowed_tools must not include write/destructive tools"
+        )
+    if rovo_mcp.oauth_timeout_seconds < 30:
+        raise ValueError("rovoMcp.oauth_timeout_seconds must be at least 30")
 
     return LocalConfig(
         ollama=ollama,
         opensearch=opensearch,
         postgres=postgres,
-        jira=jira,
+        jira_mcp=jira_mcp,
+        rovo_mcp=rovo_mcp,
         mcp=mcp,
         agent=agent,
         validation=validation,

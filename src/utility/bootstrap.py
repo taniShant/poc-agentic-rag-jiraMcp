@@ -54,7 +54,7 @@ def main() -> None:
         f"created={created}"
     )
 
-    if config.jira.enabled:
+    if config.jira_mcp.enabled:
         print("Jira MCP: enabled")
     else:
         print("Jira MCP: disabled until credentials are set in local.json")

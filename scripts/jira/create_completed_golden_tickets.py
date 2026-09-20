@@ -358,7 +358,7 @@ def load_jira_settings(config_path: Path) -> JiraSettings:
         ValueError: If the Jira section or a required value is missing.
     """
     document = json.loads(config_path.read_text(encoding="utf-8"))
-    jira = document.get("jira")
+    jira = document.get("jiraMcp")
     if not isinstance(jira, dict):
         raise ValueError("local.json must contain a jira object")
     required = ("base_url", "email", "api_token", "project_key")
@@ -786,7 +786,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--confirm-project",
-        help="Required with --execute; must exactly match jira.project_key",
+        help="Required with --execute; must exactly match jiraMcp.project_key",
     )
     arguments = parser.parse_args()
 
@@ -802,9 +802,9 @@ def main() -> None:
 
     settings = load_jira_settings(Path(arguments.config).expanduser().resolve())
     if not settings.enabled:
-        parser.error("Set jira.enabled=true in local.json before executing")
+        parser.error("Set jiraMcp.enabled=true in local.json before executing")
     if settings.read_only:
-        parser.error("Set jira.read_only=false temporarily before executing")
+        parser.error("Set jiraMcp.read_only=false temporarily before executing")
     if arguments.confirm_project != settings.project_key:
         parser.error(
             f"--confirm-project must exactly match configured key {settings.project_key!r}"
@@ -819,7 +819,7 @@ def main() -> None:
     finally:
         client.close()
     print(f"Completed Jira golden-data seed: {counters}")
-    print("Set jira.read_only=true again before running the agent.")
+    print("Set jiraMcp.read_only=true again before running the agent.")
 
 
 if __name__ == "__main__":
