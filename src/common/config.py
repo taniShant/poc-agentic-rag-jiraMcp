@@ -70,8 +70,22 @@ class RovoMcpConfig:
     redirect_uri: str
     token_store: Path
     scopes: str
-    allowed_tools: tuple[str, ...]
+    roles: dict[str, "RovoRoleConfig"]
     oauth_timeout_seconds: int
+
+    def tools_for_role(self, role: str) -> tuple[str, ...]:
+        """Return the explicit tool allowlist for a configured Rovo role."""
+        try:
+            return self.roles[role].allowed_tools
+        except KeyError as error:
+            raise ValueError(f"unknown Rovo MCP role: {role}") from error
+
+
+@dataclass(frozen=True)
+class RovoRoleConfig:
+    """Tool allowlist for one independently connected Rovo MCP role."""
+
+    allowed_tools: tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -172,6 +186,38 @@ def load_config(path: str | Path = "ci-cd/env/local.json") -> LocalConfig:
     token_store = Path(token_store_value).expanduser()
     if not token_store.is_absolute():
         token_store = source_path.parents[2] / token_store
+    role_values = rovo_values.get("roles", {})
+    if not isinstance(role_values, dict):
+        raise ValueError("rovoMcp.roles must be an object")
+    default_reader_tools = [
+        "atlassianUserInfo",
+        "getAccessibleAtlassianResources",
+        "getJiraIssue",
+        "searchJiraIssuesUsingJql",
+        "discover",
+        "executeRead",
+    ]
+    default_writer_tools = [
+        "createJiraIssue",
+        "editJiraIssue",
+        "transitionJiraIssue",
+        "addOrEditJiraIssueComment",
+    ]
+
+    def parse_role(name: str, defaults: list[str]) -> RovoRoleConfig:
+        """Parse one named Rovo role and its exact tool allowlist."""
+        value = role_values.get(name, {})
+        if not isinstance(value, dict):
+            raise ValueError(f"rovoMcp.roles.{name} must be an object")
+        tools = value.get("allowed_tools", defaults)
+        if not isinstance(tools, list) or not all(
+            isinstance(item, str) for item in tools
+        ):
+            raise ValueError(
+                f"rovoMcp.roles.{name}.allowed_tools must be a string array"
+            )
+        return RovoRoleConfig(tuple(tools))
+
     rovo_mcp = RovoMcpConfig(
         enabled=bool(rovo_values.get("enabled", False)),
         server_url=str(
@@ -186,23 +232,14 @@ def load_config(path: str | Path = "ci-cd/env/local.json") -> LocalConfig:
         scopes=str(
             rovo_values.get(
                 "scopes",
-                "read:jira:agent-interface search:jira:agent-interface",
+                "read:jira:agent-interface search:jira:agent-interface "
+                "write:jira:agent-interface",
             )
         ),
-        allowed_tools=tuple(
-            str(item)
-            for item in rovo_values.get(
-                "allowed_tools",
-                [
-                    "atlassianUserInfo",
-                    "getAccessibleAtlassianResources",
-                    "getJiraIssue",
-                    "searchJiraIssuesUsingJql",
-                    "discover",
-                    "executeRead",
-                ],
-            )
-        ),
+        roles={
+            "reader": parse_role("reader", default_reader_tools),
+            "writer": parse_role("writer", default_writer_tools),
+        },
         oauth_timeout_seconds=int(rovo_values.get("oauth_timeout_seconds", 300)),
     )
     mcp = McpConfig(**_required_section(document, "mcp"))
@@ -274,10 +311,29 @@ def load_config(path: str | Path = "ci-cd/env/local.json") -> LocalConfig:
     ):
         raise ValueError("rovoMcp.redirect_uri must use a loopback HTTP address")
     forbidden_rovo_tools = {"executeWrite", "executeDestructive"}
-    if forbidden_rovo_tools.intersection(rovo_mcp.allowed_tools):
+    safe_writer_tools = set(default_writer_tools)
+    reader_tools = set(rovo_mcp.tools_for_role("reader"))
+    writer_tools = set(rovo_mcp.tools_for_role("writer"))
+    if forbidden_rovo_tools.intersection(reader_tools | writer_tools):
         raise ValueError(
-            "rovoMcp.allowed_tools must not include write/destructive tools"
+            "Rovo role allowlists must not include generic/destructive tools"
         )
+    if reader_tools.intersection(safe_writer_tools):
+        raise ValueError("rovoMcp reader role must not include Jira write tools")
+    if not reader_tools.issubset(set(default_reader_tools)):
+        raise ValueError(
+            "rovoMcp reader role contains a tool outside the read allowlist"
+        )
+    if not writer_tools.issubset(safe_writer_tools):
+        raise ValueError(
+            "rovoMcp writer role contains a tool outside the safe write allowlist"
+        )
+    if (
+        rovo_mcp.enabled
+        and writer_tools
+        and "write:jira:agent-interface" not in rovo_mcp.scopes.split()
+    ):
+        raise ValueError("rovoMcp writer role requires write:jira:agent-interface scope")
     if rovo_mcp.oauth_timeout_seconds < 30:
         raise ValueError("rovoMcp.oauth_timeout_seconds must be at least 30")
 

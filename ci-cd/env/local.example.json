@@ -39,15 +39,27 @@
     "redirect_uri": "http://127.0.0.1:8765/oauth/callback",
     "token_store": ".local/rovo_oauth_tokens.json",
     "oauth_timeout_seconds": 300,
-    "scopes": "read:jira:agent-interface search:jira:agent-interface",
-    "allowed_tools": [
-      "atlassianUserInfo",
-      "getAccessibleAtlassianResources",
-      "getJiraIssue",
-      "searchJiraIssuesUsingJql",
-      "discover",
-      "executeRead"
-    ]
+    "scopes": "read:jira:agent-interface search:jira:agent-interface write:jira:agent-interface",
+    "roles": {
+      "reader": {
+        "allowed_tools": [
+          "atlassianUserInfo",
+          "getAccessibleAtlassianResources",
+          "getJiraIssue",
+          "searchJiraIssuesUsingJql",
+          "discover",
+          "executeRead"
+        ]
+      },
+      "writer": {
+        "allowed_tools": [
+          "createJiraIssue",
+          "editJiraIssue",
+          "transitionJiraIssue",
+          "addOrEditJiraIssueComment"
+        ]
+      }
+    }
   },
   "mcp": {
     "transport": "stdio",

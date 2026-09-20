@@ -1,25 +1,31 @@
 # Local Strands Multi-Agent Jira Assistant
 
-This project runs locally without AWS. It uses three Strands agents with
+This project runs locally without AWS. It uses four isolated agent roles with
 Ollama, OpenSearch, PostgreSQL, and an optional Jira Cloud MCP connection.
 
 ```text
 User
   |
   v
-Planner  --->  Executor  --->  Critic
-                 ^              |
-                 |---- REFINE ---|
-                 |
-          OpenSearch + Jira MCP
+Planner  --->  Executor  --->  Critic  ---> proposal stored
+                 ^              |                 |
+                 |---- REFINE ---|                 v
+                 |                         human approval file
+       OpenSearch + reader MCP                    |
+                                                  v
+                                         deterministic Writer
+                                                  |
+                                             writer MCP
 
-PostgreSQL: conversation memory + idempotency + reflection audit
+PostgreSQL: memory + idempotency + reflection + proposal/execution audit
 ```
 
 - The **Planner** creates an evidence-gathering plan and has no tools.
 - The **Executor** can search OpenSearch and, when enabled, call the read-only
   Jira MCP tools.
 - The **Critic** independently scores the answer and requests bounded revisions.
+- The **Writer** can call one of four explicit Rovo write tools only after a
+  Critic PASS and a matching, unexpired, one-time human approval.
 - PostgreSQL stores runtime state. Jira, Confluence, and known-issue documents
   and their vectors are stored in OpenSearch.
 
@@ -44,7 +50,7 @@ ollama --version
 All commands below are run from the project root:
 
 ```bash
-cd /Users/shantanu/Downloads/CodeProjects/AGENTIC_AI_PROJECTS/POC-AGENTIC-MPC-JIRA/poc-agentic-mcp-local
+cd /Users/shantanu/Downloads/CodeProjects/AGENTIC_AI_PROJECTS/POC-AGENTIC-MPC-JIRA/poc-agentic-rag-jiraMcp
 ```
 
 ## 1. Create the Python environment
@@ -176,6 +182,9 @@ applies it idempotently:
    - creates `idempotency_record`
 2. `002_agent_reflection_audit.sql`
    - creates `agent_reflection_audit`
+3. `003_jira_action_approval.sql`
+   - creates `jira_action_proposal`
+   - creates `jira_action_execution`
 
 Bootstrap also verifies the Ollama models and embedding dimension, checks the
 OpenSearch cluster, and creates the configured OpenSearch index when missing.
@@ -194,6 +203,10 @@ docker exec customer-agent-postgres \
 docker exec customer-agent-postgres \
   psql -U agentic_local -d agentic_local \
   -c 'SELECT COUNT(*) FROM agent_reflection_audit;'
+
+docker exec customer-agent-postgres \
+  psql -U agentic_local -d agentic_local \
+  -c 'SELECT * FROM jira_action_execution ORDER BY created_at DESC LIMIT 10;'
 ```
 
 ## 6. Populate OpenSearch
@@ -318,15 +331,27 @@ Configure `local.json` as follows and keep `jiraMcp.enabled=false`:
     "redirect_uri": "http://127.0.0.1:8765/oauth/callback",
     "token_store": ".local/rovo_oauth_tokens.json",
     "oauth_timeout_seconds": 300,
-    "scopes": "read:jira:agent-interface search:jira:agent-interface",
-    "allowed_tools": [
-      "atlassianUserInfo",
-      "getAccessibleAtlassianResources",
-      "getJiraIssue",
-      "searchJiraIssuesUsingJql",
-      "discover",
-      "executeRead"
-    ]
+    "scopes": "read:jira:agent-interface search:jira:agent-interface write:jira:agent-interface",
+    "roles": {
+      "reader": {
+        "allowed_tools": [
+          "atlassianUserInfo",
+          "getAccessibleAtlassianResources",
+          "getJiraIssue",
+          "searchJiraIssuesUsingJql",
+          "discover",
+          "executeRead"
+        ]
+      },
+      "writer": {
+        "allowed_tools": [
+          "createJiraIssue",
+          "editJiraIssue",
+          "transitionJiraIssue",
+          "addOrEditJiraIssueComment"
+        ]
+      }
+    }
   }
 }
 ```
@@ -337,11 +362,45 @@ After approval, Atlassian redirects to the loopback callback. Tokens and dynamic
 client registration are saved under `.local/` with owner-only file permissions.
 Later runs reuse or refresh the stored token.
 
-The allowlist intentionally excludes `executeWrite` and `executeDestructive`.
-The remote tools are exposed to the Executor with a `rovo_` prefix. Your
+The allowlists intentionally exclude `executeWrite`, `executeDestructive`, and
+all delete operations. Reader tools are exposed only with `rovo_reader_`
+prefixes. Writer tools are never given to the Planner, Executor, or Critic. Your
 Atlassian administrator may also need to allow the callback/domain in the Rovo
 MCP administration settings. Delete `.local/rovo_oauth_tokens.json` to force a
 new authorization flow.
+
+### Human-approved Jira write workflow
+
+Set both `rovoMcp.enabled` and `validation.enabled` to `true`. First run an
+investigation with an explicit request ID:
+
+```bash
+python -m src.agents.step_1_cli_entry \
+  --config ci-cd/env/local.json \
+  --session-id jira-write-demo \
+  --request-id change-001 \
+  "Investigate SCRUM-7 and propose a verified resolution comment"
+```
+
+When the Critic passes a draft containing a proposal, the command prints an
+approval JSON template and stores the immutable proposal in PostgreSQL. Copy
+that JSON to a local file, replace the approval ID, approver, and timestamps,
+and leave the issue key, action, payload, payload hash, and request ID exactly
+unchanged. Use a short expiration window, for example 10 minutes.
+
+Execute the approved action in a separate command:
+
+```bash
+python -m src.agents.step_1_cli_entry \
+  --config ci-cd/env/local.json \
+  --approval-file /absolute/path/to/approval.json
+```
+
+The write is rejected unless the stored Critic verdict is `PASS`, the approval
+is current and unused, and every approved action field exactly matches the
+stored proposal. The Writer directly calls exactly one mapped Rovo tool with
+the approved payload; no LLM rewrites the mutation. PostgreSQL records the
+approver, timestamps, payload hash, tool, status, response, and any failure.
 
 ## 9. Run tests
 
@@ -448,8 +507,10 @@ ollama rm nomic-embed-text
 - `src/agents/step_4_executor.py`: tool-enabled Executor
 - `src/agents/step_5_critic.py`: independent Critic agent
 - `src/validations/step_6_critic_reflections.py`: bounded Critic/Executor reflection controls
+- `src/validations/step_7_human_approval.py`: strict approval gate
+- `src/agents/step_8_writer.py`: deterministic, allowlisted Writer role
 - `src/vectorDb/ingestion.py`: OpenSearch input pipeline
 - `src/vectorDb/retrieval.py`: hybrid retrieval
 - `src/mcp/jira_server.py`: read-only Jira MCP server
-- `src/memory/postgres.py`: memory, idempotency, and reflection persistence
+- `src/memory/postgres.py`: memory, idempotency, reflection, and write audit persistence
 - `scripts/postgresDb`: ordered PostgreSQL migrations

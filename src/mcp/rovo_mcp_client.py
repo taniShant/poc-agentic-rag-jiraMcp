@@ -67,21 +67,24 @@ async def rovo_streamable_http_transport(
 
 def create_rovo_mcp_client(
     config: RovoMcpConfig,
+    role: str,
     startup_timeout_seconds: int,
     request_timeout_seconds: int,
 ) -> MCPClient:
-    """Create a read-only Strands client for Atlassian Rovo MCP.
+    """Create a role-isolated Strands client for Atlassian Rovo MCP.
 
     Args:
         config: Rovo OAuth and MCP settings from ``local.json``.
+        role: Configured role name, currently ``reader`` or ``writer``.
         startup_timeout_seconds: Normal MCP connection timeout.
         request_timeout_seconds: Network timeout for MCP requests.
 
     Returns:
-        A Strands MCP client restricted to the configured read-only tools.
+        A Strands MCP client restricted to the selected role's tools.
     """
     if not config.enabled:
         raise RuntimeError("Rovo MCP integration is disabled in local.json")
+    allowed_tools = config.tools_for_role(role)
     effective_startup_timeout = max(
         startup_timeout_seconds,
         config.oauth_timeout_seconds + 30,
@@ -89,6 +92,6 @@ def create_rovo_mcp_client(
     return MCPClient(
         lambda: rovo_streamable_http_transport(config, request_timeout_seconds),
         startup_timeout=effective_startup_timeout,
-        tool_filters={"allowed": list(config.allowed_tools)},
-        prefix="rovo",
+        tool_filters={"allowed": list(allowed_tools)},
+        prefix=f"rovo_{role}",
     )

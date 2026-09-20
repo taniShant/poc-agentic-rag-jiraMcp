@@ -11,6 +11,8 @@ Current migrations:
   processing.
 - `002_agent_reflection_audit.sql` records every Critic cycle, including the
   draft hash, quality scores, verdict, and issues.
+- `003_jira_action_approval.sql` stores immutable Jira write proposals and the
+  one-time human approval/execution audit, including response or failure.
 
 Apply the migrations together with the other local bootstrap checks:
 
@@ -32,6 +34,8 @@ Then run:
 \d agent_memory
 \d idempotency_record
 \d agent_reflection_audit
+\d jira_action_proposal
+\d jira_action_execution
 ```
 
  
@@ -39,6 +43,8 @@ Then run:
 SELECT * FROM agent_memory ORDER BY created_at DESC LIMIT 10;
 SELECT * FROM idempotency_record ORDER BY created_at DESC LIMIT 10;
 SELECT * FROM agent_reflection_audit ORDER BY created_at DESC LIMIT 10;
+SELECT * FROM jira_action_proposal ORDER BY created_at DESC LIMIT 10;
+SELECT * FROM jira_action_execution ORDER BY created_at DESC LIMIT 10;
 
 
 PostgreSQL does not store Jira tickets. Jira ticket snapshots and vectors belong

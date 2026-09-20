@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 import uuid
 from pathlib import Path
@@ -13,15 +14,18 @@ from strands import tool
 from strands.models.ollama import OllamaModel
 from strands.tools.mcp import MCPClient
 
+from src.agents.contracts import ApprovedJiraAction, WorkflowResult
 from src.agents.step_2_orchestrator import MultiAgentOrchestrator
 from src.agents.step_3_planner import PlannerAgent
 from src.agents.step_4_executor import ExecutorAgent
 from src.agents.step_5_critic import CriticAgent
+from src.agents.step_8_writer import WriterAgent
 from src.common.config import LocalConfig, load_config
 from src.memory.postgres import LocalStorage
 from src.mcp.rovo_mcp_client import create_rovo_mcp_client
 from src.vectorDb.embeddings import OllamaEmbeddings
 from src.vectorDb.retrieval import HybridKnowledgeRetriever
+from src.validations.step_7_human_approval import HumanApprovalValidator
 
 _RETRIEVER: HybridKnowledgeRetriever | None = None
 
@@ -86,7 +90,7 @@ def _invoke(
     storage: LocalStorage,
     session_id: str,
     request_id: str,
-) -> str:
+) -> WorkflowResult:
     """Run Planner, tool-enabled Executor, and optional Critic reflection.
 
     Args:
@@ -98,7 +102,7 @@ def _invoke(
         request_id: Idempotency identifier correlated with audit records.
 
     Returns:
-        Final answer text, including an escalation marker when applicable.
+        Structured final result including any proposed Jira mutation.
     """
     tools: list[Any] = [search_support_knowledge]
     if mcp_client is not None:
@@ -124,7 +128,7 @@ def _invoke(
             record,
         ),
     )
-    return orchestrator.run(prompt).render()
+    return orchestrator.run(prompt)
 
 
 def run_request(
@@ -155,11 +159,12 @@ def run_request(
         if config.rovo_mcp.enabled:
             mcp_client = create_rovo_mcp_client(
                 config.rovo_mcp,
+                role="reader",
                 startup_timeout_seconds=config.mcp.startup_timeout_seconds,
                 request_timeout_seconds=config.agent.request_timeout_seconds,
             )
             with mcp_client:
-                response = _invoke(
+                result = _invoke(
                     config,
                     augmented_prompt,
                     mcp_client,
@@ -183,7 +188,7 @@ def run_request(
                 startup_timeout=config.mcp.startup_timeout_seconds,
             )
             with mcp_client:
-                response = _invoke(
+                result = _invoke(
                     config,
                     augmented_prompt,
                     mcp_client,
@@ -192,7 +197,7 @@ def run_request(
                     request_id,
                 )
         else:
-            response = _invoke(
+            result = _invoke(
                 config,
                 augmented_prompt,
                 None,
@@ -201,12 +206,74 @@ def run_request(
                 request_id,
             )
 
+        if result.draft.proposed_action is not None:
+            storage.save_jira_proposal(
+                request_id,
+                session_id,
+                result.draft.proposed_action,
+                result.critique.verdict,
+            )
+        response = result.render(request_id)
         storage.add_memory(session_id, "user", prompt)
         storage.add_memory(session_id, "assistant", response)
         storage.complete_request(request_id, response)
         return response
     except Exception as error:
         storage.fail_request(request_id, f"{type(error).__name__}: {error}")
+        raise
+
+
+def execute_approved_write(config: LocalConfig, approval_path: str | Path) -> str:
+    """Validate and execute one exact human-approved Rovo Jira mutation.
+
+    Args:
+        config: Complete local application configuration.
+        approval_path: JSON file containing the signed-off proposal fields.
+
+    Returns:
+        JSON-formatted Rovo mutation result.
+
+    Raises:
+        RuntimeError: If Rovo or Critic validation is disabled.
+        PermissionError: If approval validation fails.
+        ValueError: If the approval was already used.
+    """
+    if not config.rovo_mcp.enabled:
+        raise RuntimeError("approved Jira writes require rovoMcp.enabled=true")
+    if not config.validation.enabled:
+        raise RuntimeError("approved Jira writes require validation.enabled=true")
+    document = json.loads(Path(approval_path).expanduser().read_text(encoding="utf-8"))
+    if not isinstance(document, dict):
+        raise ValueError("approval file must contain a JSON object")
+    approval = ApprovedJiraAction.from_dict(document)
+    storage = LocalStorage(config.postgres)
+    stored = storage.get_jira_proposal(approval.request_id)
+    HumanApprovalValidator().validate(
+        approval,
+        stored.proposal,
+        stored.critic_verdict,
+    )
+    tool_name = WriterAgent.ACTION_TO_TOOL[approval.action]
+    storage.claim_jira_approval(approval, tool_name)
+    try:
+        writer_client = create_rovo_mcp_client(
+            config.rovo_mcp,
+            role="writer",
+            startup_timeout_seconds=config.mcp.startup_timeout_seconds,
+            request_timeout_seconds=config.agent.request_timeout_seconds,
+        )
+        with writer_client:
+            result = WriterAgent(
+                writer_client,
+                config.rovo_mcp.tools_for_role("writer"),
+            ).execute(approval)
+        storage.complete_jira_approval(result)
+        return json.dumps(result.to_dict(), indent=2, ensure_ascii=False)
+    except Exception as error:
+        storage.fail_jira_approval(
+            approval.approval_id,
+            f"{type(error).__name__}: {error}",
+        )
         raise
 
 
@@ -219,8 +286,17 @@ def main() -> None:
     )
     parser.add_argument("--session-id", help="Conversation memory session ID")
     parser.add_argument("--request-id", help="Idempotency key; generated if omitted")
+    parser.add_argument(
+        "--approval-file",
+        help="Execute one previously proposed action from an approval JSON file",
+    )
     arguments = parser.parse_args()
     config = load_config(arguments.config)
+    if arguments.approval_file:
+        if arguments.prompt:
+            parser.error("prompt cannot be combined with --approval-file")
+        print(execute_approved_write(config, arguments.approval_file))
+        return
     prompt = arguments.prompt or input("Prompt: ").strip()
     if not prompt:
         raise ValueError("prompt must not be empty")

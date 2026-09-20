@@ -10,7 +10,15 @@ from typing import Any
 import pg8000.dbapi
 
 from src.common.config import PostgresConfig
-from src.agents.contracts import LoopRecord
+from src.agents.contracts import (
+    ApprovedJiraAction,
+    JiraAction,
+    JiraMutationResult,
+    LoopRecord,
+    ProposedJiraAction,
+    StoredJiraProposal,
+    Verdict,
+)
 
 
 def _split_sql_statements(sql_text: str) -> list[str]:
@@ -275,6 +283,177 @@ class LocalStorage:
                 json.dumps(record.issues),
                 record.created_at,
             ),
+        )
+
+    def save_jira_proposal(
+        self,
+        request_id: str,
+        session_id: str,
+        proposal: ProposedJiraAction,
+        critic_verdict: Verdict,
+    ) -> None:
+        """Persist the exact proposed Jira mutation and its Critic verdict.
+
+        Args:
+            request_id: Idempotent investigation request identifier.
+            session_id: Conversation identifier that produced the proposal.
+            proposal: Exact mutation proposed by the Executor.
+            critic_verdict: Final Critic outcome for the response draft.
+        """
+        self._execute(
+            """
+            INSERT INTO jira_action_proposal (
+                request_id, session_id, issue_key, action, payload,
+                payload_hash, rationale, critic_verdict
+            ) VALUES (%s, %s, %s, %s, %s::jsonb, %s, %s, %s)
+            ON CONFLICT (request_id) DO NOTHING
+            """,
+            (
+                request_id,
+                session_id,
+                proposal.issue_key,
+                proposal.action.value,
+                json.dumps(proposal.payload, ensure_ascii=False),
+                proposal.payload_hash,
+                proposal.rationale,
+                critic_verdict.value,
+            ),
+        )
+
+    def get_jira_proposal(self, request_id: str) -> StoredJiraProposal:
+        """Load one immutable Jira proposal by its investigation request ID.
+
+        Args:
+            request_id: Investigation request identifier in the approval file.
+
+        Returns:
+            Stored proposal and its final Critic verdict.
+
+        Raises:
+            LookupError: If no proposal exists for the request.
+        """
+        connection = self._connect()
+        try:
+            cursor = connection.cursor()
+            cursor.execute(
+                """
+                SELECT session_id, issue_key, action, payload, rationale,
+                       critic_verdict
+                FROM jira_action_proposal
+                WHERE request_id = %s
+                """,
+                (request_id,),
+            )
+            row = cursor.fetchone()
+            if row is None:
+                raise LookupError(f"no Jira proposal exists for request {request_id}")
+            payload = row[3] if isinstance(row[3], dict) else json.loads(row[3])
+            return StoredJiraProposal(
+                request_id=request_id,
+                session_id=str(row[0]),
+                proposal=ProposedJiraAction(
+                    issue_key=str(row[1]),
+                    action=JiraAction(str(row[2])),
+                    payload=payload,
+                    rationale=str(row[4]),
+                ),
+                critic_verdict=Verdict(str(row[5])),
+            )
+        finally:
+            connection.close()
+
+    def claim_jira_approval(
+        self,
+        approval: ApprovedJiraAction,
+        tool_name: str,
+    ) -> None:
+        """Atomically mark an approval used before the external Jira call.
+
+        Args:
+            approval: Fully validated human approval artifact.
+            tool_name: Exact allowlisted Rovo tool selected for execution.
+
+        Raises:
+            ValueError: If this approval or proposal has already been used.
+        """
+        connection = self._connect()
+        try:
+            cursor = connection.cursor()
+            cursor.execute(
+                """
+                SELECT status FROM jira_action_execution
+                WHERE approval_id = %s
+                FOR UPDATE
+                """,
+                (approval.approval_id,),
+            )
+            if cursor.fetchone() is not None:
+                raise ValueError("approval_id has already been used")
+            cursor.execute(
+                """
+                SELECT approval_id FROM jira_action_execution
+                WHERE request_id = %s AND status IN ('processing', 'completed')
+                FOR UPDATE
+                """,
+                (approval.request_id,),
+            )
+            if cursor.fetchone() is not None:
+                raise ValueError(
+                    "this Jira proposal is already processing or completed"
+                )
+            cursor.execute(
+                """
+                INSERT INTO jira_action_execution (
+                    approval_id, request_id, issue_key, action, payload,
+                    payload_hash, approved_by, approved_at, expires_at,
+                    status, tool_name
+                ) VALUES (
+                    %s, %s, %s, %s, %s::jsonb, %s, %s, %s, %s,
+                    'processing', %s
+                )
+                """,
+                (
+                    approval.approval_id,
+                    approval.request_id,
+                    approval.issue_key,
+                    approval.action.value,
+                    json.dumps(approval.payload, ensure_ascii=False),
+                    approval.payload_hash,
+                    approval.approved_by,
+                    approval.approved_at,
+                    approval.expires_at,
+                    tool_name,
+                ),
+            )
+            connection.commit()
+        except Exception:
+            connection.rollback()
+            raise
+        finally:
+            connection.close()
+
+    def complete_jira_approval(self, result: JiraMutationResult) -> None:
+        """Store the successful Rovo response for a claimed approval."""
+        self._execute(
+            """
+            UPDATE jira_action_execution
+            SET status = 'completed', response_json = %s::jsonb,
+                error_text = NULL, updated_at = CURRENT_TIMESTAMP
+            WHERE approval_id = %s AND status = 'processing'
+            """,
+            (json.dumps(result.response, ensure_ascii=False), result.approval_id),
+        )
+
+    def fail_jira_approval(self, approval_id: str, error: str) -> None:
+        """Store a sanitized failure for a claimed approval."""
+        self._execute(
+            """
+            UPDATE jira_action_execution
+            SET status = 'failed', error_text = %s,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE approval_id = %s AND status = 'processing'
+            """,
+            (error[:4000], approval_id),
         )
 
     def _execute(self, sql: str, parameters: tuple[Any, ...]) -> None:

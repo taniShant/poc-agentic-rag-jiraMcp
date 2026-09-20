@@ -5,15 +5,26 @@ from __future__ import annotations
 import json
 import tempfile
 import unittest
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from mcp.shared.auth import OAuthClientInformationFull, OAuthToken
 
-from src.agents.contracts import Critique, Draft, Plan, Verdict
+from src.agents.contracts import (
+    ApprovedJiraAction,
+    Critique,
+    Draft,
+    JiraAction,
+    Plan,
+    ProposedJiraAction,
+    Verdict,
+)
+from src.agents.step_8_writer import WriterAgent
 from src.common.config import load_config
 from src.common.config import ValidationConfig
 from src.mcp.rovo_mcp_oauth import RovoFileTokenStorage
 from src.validations.step_6_critic_reflections import ReflectionLoop
+from src.validations.step_7_human_approval import HumanApprovalValidator
 from src.vectorDb.ingestion import (
     normalize_confluence_page,
     normalize_golden_ticket,
@@ -34,8 +45,9 @@ class LocalRuntimeTests(unittest.TestCase):
             config.rovo_mcp.server_url,
             "https://mcp.atlassian.com/v2/mcp",
         )
-        self.assertNotIn("executeWrite", config.rovo_mcp.allowed_tools)
-        self.assertNotIn("executeDestructive", config.rovo_mcp.allowed_tools)
+        self.assertNotIn("executeWrite", config.rovo_mcp.tools_for_role("reader"))
+        self.assertNotIn("executeDestructive", config.rovo_mcp.tools_for_role("writer"))
+        self.assertIn("createJiraIssue", config.rovo_mcp.tools_for_role("writer"))
 
     def test_rovo_configuration_rejects_write_execution_tools(self) -> None:
         """Rovo configuration must never expose generic write pathways."""
@@ -43,12 +55,94 @@ class LocalRuntimeTests(unittest.TestCase):
             Path("ci-cd/env/local.example.json").read_text(encoding="utf-8")
         )
         document["rovoMcp"]["enabled"] = True
-        document["rovoMcp"]["allowed_tools"].append("executeWrite")
+        document["rovoMcp"]["roles"]["writer"]["allowed_tools"].append(
+            "executeWrite"
+        )
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "unsafe.json"
             path.write_text(json.dumps(document), encoding="utf-8")
-            with self.assertRaisesRegex(ValueError, "write/destructive"):
+            with self.assertRaisesRegex(ValueError, "generic/destructive"):
                 load_config(path)
+
+    def test_human_approval_requires_exact_unexpired_passed_proposal(self) -> None:
+        """Only an exact approval for a Critic-passed proposal may proceed."""
+        now = datetime.now(timezone.utc)
+        proposal = ProposedJiraAction(
+            "SCRUM-7",
+            JiraAction.ADD_COMMENT,
+            {"issueKey": "SCRUM-7", "commentBody": "Approved response"},
+            "Share the verified resolution.",
+        )
+        approval = ApprovedJiraAction(
+            "approval-7",
+            "request-7",
+            proposal.issue_key,
+            proposal.action,
+            proposal.payload,
+            proposal.payload_hash,
+            "support.manager@example.com",
+            now - timedelta(minutes=1),
+            now + timedelta(minutes=10),
+        )
+        HumanApprovalValidator().validate(approval, proposal, Verdict.PASS, now)
+        changed = ApprovedJiraAction(
+            approval.approval_id,
+            approval.request_id,
+            approval.issue_key,
+            approval.action,
+            {"issueKey": "SCRUM-7", "commentBody": "Changed"},
+            approval.payload_hash,
+            approval.approved_by,
+            approval.approved_at,
+            approval.expires_at,
+        )
+        with self.assertRaisesRegex(PermissionError, "payload"):
+            HumanApprovalValidator().validate(changed, proposal, Verdict.PASS, now)
+        with self.assertRaisesRegex(PermissionError, "Critic PASS"):
+            HumanApprovalValidator().validate(approval, proposal, Verdict.REFINE, now)
+
+    def test_writer_calls_only_mapped_tool_with_unchanged_payload(self) -> None:
+        """The Writer must pass approved arguments directly to one safe tool."""
+
+        class FakeMcpClient:
+            """Capture one deterministic MCP tool invocation."""
+
+            def __init__(self) -> None:
+                """Initialize without a recorded call."""
+                self.call = None
+
+            def call_tool_sync(
+                self,
+                tool_use_id: str,
+                name: str,
+                arguments: dict[str, object],
+            ) -> dict[str, object]:
+                """Capture the call and return a successful response."""
+                self.call = (tool_use_id, name, arguments)
+                return {"status": "success", "content": [{"text": "ok"}]}
+
+        now = datetime.now(timezone.utc)
+        payload = {"issueKey": "SCRUM-9", "commentBody": "Exact text"}
+        approval = ApprovedJiraAction(
+            "approval-9",
+            "request-9",
+            "SCRUM-9",
+            JiraAction.ADD_COMMENT,
+            payload,
+            ProposedJiraAction(
+                "SCRUM-9", JiraAction.ADD_COMMENT, payload, "Reason"
+            ).payload_hash,
+            "manager@example.com",
+            now,
+            now + timedelta(minutes=5),
+        )
+        client = FakeMcpClient()
+        result = WriterAgent(
+            client,  # type: ignore[arg-type]
+            ("addOrEditJiraIssueComment",),
+        ).execute(approval)
+        self.assertEqual(client.call[1:], ("addOrEditJiraIssueComment", payload))
+        self.assertEqual(result.tool_name, "addOrEditJiraIssueComment")
 
     def test_rovo_token_storage_round_trip(self) -> None:
         """OAuth tokens and DCR metadata must survive secure local storage."""
@@ -92,6 +186,9 @@ class LocalRuntimeTests(unittest.TestCase):
         )
         self.assertTrue(
             (migration_directory / "002_agent_reflection_audit.sql").is_file()
+        )
+        self.assertTrue(
+            (migration_directory / "003_jira_action_approval.sql").is_file()
         )
 
     def test_rank_fusion_rewards_results_present_in_both_lists(self) -> None:

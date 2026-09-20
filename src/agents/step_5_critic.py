@@ -21,7 +21,10 @@ You are the independent Critic in a Jira support workflow. Judge the draft only
 against the request, plan, citations, and evidence supplied. Score accuracy,
 groundedness, completeness, and relevance from 1 to 5. Flag unsupported ticket
 keys, status values, URLs, commands, and resolution claims. Give specific fixes
-and list correct content that revisions must preserve. Return JSON only:
+and list correct content that revisions must preserve. If proposed_action is
+present, verify it is supported by the evidence, contains exact tool arguments,
+targets the intended issue, and uses only create_issue, edit_issue, add_comment,
+or transition_issue. Reject delete or generic write actions. Return JSON only:
 {"criterion_scores":{"accuracy":1,"groundedness":1,"completeness":1,
 "relevance":1},"issues":["specific fix"],"preserve":["correct section"]}
 """.strip()
@@ -46,6 +49,11 @@ and list correct content that revisions must preserve. Return JSON only:
                 "citations": draft.citations,
                 "evidence": draft.evidence,
                 "unresolved_questions": draft.unresolved_questions,
+                "proposed_action": (
+                    draft.proposed_action.to_dict()
+                    if draft.proposed_action is not None
+                    else None
+                ),
             },
         }
         value = parse_json_object(
